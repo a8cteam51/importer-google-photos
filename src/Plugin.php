@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Scaffold;
+namespace A8C\SpecialProjects\google-photos-album;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -108,7 +108,7 @@ class Plugin {
 		}
 
 		// Get the minimum WooCommerce version required from the plugin's header, if needed.
-		$minimum_wc_version = a8csp_scaffold_get_plugin_metadata( \WC_Plugin_Updates::VERSION_REQUIRED_HEADER );
+		$minimum_wc_version = google_photos_album_get_plugin_metadata( \WC_Plugin_Updates::VERSION_REQUIRED_HEADER );
 		if ( \is_null( $minimum_wc_version ) ) {
 			return true;
 		}
@@ -152,7 +152,7 @@ class Plugin {
 	public function maybe_initialize(): void {
 		$is_active = $this->is_active();
 		if ( is_wp_error( $is_active ) ) {
-			a8csp_scaffold_output_requirements_error( $is_active );
+			google_photos_album_output_requirements_error( $is_active );
 			return;
 		}
 

@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-use A8C\SpecialProjects\Scaffold\Plugin;
+use A8C\SpecialProjects\google-photos-album\Plugin;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @return  Plugin
  */
-function a8csp_scaffold_get_plugin_instance(): Plugin {
+function google_photos_album_get_plugin_instance(): Plugin {
 	return Plugin::get_instance();
 }
 
@@ -22,14 +22,14 @@ function a8csp_scaffold_get_plugin_instance(): Plugin {
 
 // region OTHERS
 
-$a8csp_scaffold_files = glob( constant( 'A8CSP_SCAFFOLD_DIR_PATH' ) . 'includes/*.php' );
-if ( false !== $a8csp_scaffold_files ) {
-	foreach ( $a8csp_scaffold_files as $a8csp_scaffold_file ) {
-		if ( 1 === preg_match( '#/includes/_#i', $a8csp_scaffold_file ) ) {
+$google_photos_album_files = glob( constant( 'GOOGLE_PHOTOS_ALBUM_DIR_PATH' ) . 'includes/*.php' );
+if ( false !== $google_photos_album_files ) {
+	foreach ( $google_photos_album_files as $google_photos_album_file ) {
+		if ( 1 === preg_match( '#/includes/_#i', $google_photos_album_file ) ) {
 			continue; // Ignore files prefixed with an underscore.
 		}
 
-		require_once $a8csp_scaffold_file;
+		require_once $google_photos_album_file;
 	}
 }
 

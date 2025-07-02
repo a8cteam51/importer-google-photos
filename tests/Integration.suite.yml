@@ -16,5 +16,5 @@ modules:
            domain: '%WORDPRESS_DOMAIN%'
            adminEmail: 'admin@%WORDPRESS_DOMAIN%'
            title: 'Integration Tests'
-           plugins: ['./team51-plugin-scaffold.php']
+           plugins: ['./google-photos-album.php']
            theme: ''

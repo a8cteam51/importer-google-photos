@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Scaffold\Integrations;
+namespace A8C\SpecialProjects\google-photos-album\Integrations;
 
 defined( 'ABSPATH' ) || exit;
 

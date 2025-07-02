@@ -7,7 +7,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="a8csp-scaffold"/>
+				<element value="google-photos-album"/>
 			</property>
 		</properties>
 	</rule>
@@ -17,8 +17,8 @@
 		<properties>
 			<property name="prefixes" type="array">
 				<element value="a8csp_"/>
-				<element value="a8csp_scaffold_"/>
-				<element value="A8C\SpecialProjects\Scaffold"/>
+				<element value="google_photos_album_"/>
+				<element value="A8C\SpecialProjects\google-photos-album"/>
 			</property>
 		</properties>
 	</rule>

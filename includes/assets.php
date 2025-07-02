@@ -15,8 +15,8 @@ defined( 'ABSPATH' ) || exit;
  *
  * @return  array{ version: string, dependencies: array<string> }|null
  */
-function a8csp_scaffold_get_asset_meta( string $asset_path, ?array $extra_dependencies = null ): ?array {
-	$asset_path = str_starts_with( $asset_path, constant( 'A8CSP_SCAFFOLD_DIR_PATH' ) ) ? $asset_path : constant( 'A8CSP_SCAFFOLD_DIR_PATH' ) . $asset_path;
+function google_photos_album_get_asset_meta( string $asset_path, ?array $extra_dependencies = null ): ?array {
+	$asset_path = str_starts_with( $asset_path, constant( 'GOOGLE_PHOTOS_ALBUM_DIR_PATH' ) ) ? $asset_path : constant( 'GOOGLE_PHOTOS_ALBUM_DIR_PATH' ) . $asset_path;
 	if ( ! file_exists( $asset_path ) ) {
 		return null;
 	}
@@ -26,7 +26,7 @@ function a8csp_scaffold_get_asset_meta( string $asset_path, ?array $extra_depend
 		'version'      => (string) filemtime( $asset_path ),
 	);
 	if ( '' === $asset_meta['version'] ) {
-		$asset_meta['version'] = a8csp_scaffold_get_plugin_version();
+		$asset_meta['version'] = google_photos_album_get_plugin_version();
 	}
 
 	$asset_pathinfo              = pathinfo( $asset_path );

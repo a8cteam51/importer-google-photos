@@ -1,9 +1,9 @@
 {
-  "name": "a8cteam51/team51-plugin-scaffold",
+  "name": "a8cteam51/google-photos-album",
   "type": "wordpress-plugin",
 
-  "description": "A scaffold for A8C Special Projects plugins.",
-  "homepage": "https://github.com/a8cteam51/team51-plugin-scaffold",
+  "description": "",
+  "homepage": "https://github.com/a8cteam51/google-photos-album",
   "license": "GPL-2.0-or-later",
   "authors": [
     {
@@ -12,7 +12,7 @@
     },
     {
       "name": "Contributors",
-      "homepage": "https://github.com/a8cteam51/team51-plugin-scaffold/graphs/contributors"
+      "homepage": "https://github.com/a8cteam51/google-photos-album/graphs/contributors"
     }
   ],
 
@@ -72,8 +72,8 @@
       "@i18n:makemo",
       "@i18n:makephp"
     ],
-    "i18n:makepot": "wp i18n make-pot ./ --slug=a8csp-scaffold",
-    "i18n:updatepo": "wp i18n update-po ./languages/a8csp-scaffold.pot",
+    "i18n:makepot": "wp i18n make-pot ./ --slug=google-photos-album",
+    "i18n:updatepo": "wp i18n update-po ./languages/google-photos-album.pot",
     "i18n:makemo": "wp i18n make-mo ./languages/",
     "i18n:makephp": "wp i18n make-php ./languages/",
 

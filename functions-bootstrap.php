@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @return  ($property is null ? PluginMetaData : ($property is PluginMetaKey ? PluginMetaData[PluginMetaKey] : null))
  */
-function a8csp_scaffold_get_plugin_metadata( $property = null ) {
+function google_photos_album_get_plugin_metadata( $property = null ) {
 	static $plugin_data = null;
 
 	$can_translate = 0 < did_action( 'init' );
@@ -23,7 +23,7 @@ function a8csp_scaffold_get_plugin_metadata( $property = null ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$plugin_file                   = trailingslashit( WP_PLUGIN_DIR ) . constant( 'A8CSP_SCAFFOLD_BASENAME' );
+		$plugin_file                   = trailingslashit( WP_PLUGIN_DIR ) . constant( 'GOOGLE_PHOTOS_ALBUM_BASENAME' );
 		$plugin_data[ $translate_key ] = get_plugin_data( $plugin_file, false, $can_translate );
 	}
 
@@ -47,8 +47,8 @@ function a8csp_scaffold_get_plugin_metadata( $property = null ) {
  *
  * @return  string
  */
-function a8csp_scaffold_get_plugin_slug() {
-	$text_domain = a8csp_scaffold_get_plugin_metadata( 'TextDomain' );
+function google_photos_album_get_plugin_slug() {
+	$text_domain = google_photos_album_get_plugin_metadata( 'TextDomain' );
 	return sanitize_key( $text_domain );
 }
 
@@ -60,8 +60,8 @@ function a8csp_scaffold_get_plugin_slug() {
  *
  * @return  string
  */
-function a8csp_scaffold_get_plugin_name() {
-	return a8csp_scaffold_get_plugin_metadata( 'Name' );
+function google_photos_album_get_plugin_name() {
+	return google_photos_album_get_plugin_metadata( 'Name' );
 }
 
 /**
@@ -72,8 +72,8 @@ function a8csp_scaffold_get_plugin_name() {
  *
  * @return  string
  */
-function a8csp_scaffold_get_plugin_version() {
-	return a8csp_scaffold_get_plugin_metadata( 'Version' );
+function google_photos_album_get_plugin_version() {
+	return google_photos_album_get_plugin_metadata( 'Version' );
 }
 
 /**
@@ -83,7 +83,7 @@ function a8csp_scaffold_get_plugin_version() {
  *
  * @return  bool
  */
-function a8csp_scaffold_is_wp_version_compatible( $min_wp_version ) {
+function google_photos_album_is_wp_version_compatible( $min_wp_version ) {
 	if ( ! function_exists( 'is_wp_version_compatible' ) ) {
 		return false;
 	}
@@ -98,7 +98,7 @@ function a8csp_scaffold_is_wp_version_compatible( $min_wp_version ) {
  *
  * @return  bool
  */
-function a8csp_scaffold_is_php_version_compatible( $min_php_version ) {
+function google_photos_album_is_php_version_compatible( $min_php_version ) {
 	if ( ! function_exists( 'is_php_version_compatible' ) ) {
 		return false;
 	}
@@ -111,8 +111,8 @@ function a8csp_scaffold_is_php_version_compatible( $min_php_version ) {
  *
  * @return  true|\WP_Error
  */
-function a8csp_scaffold_validate_requirements() {
-	$plugin_metadata = a8csp_scaffold_get_plugin_metadata();
+function google_photos_album_validate_requirements() {
+	$plugin_metadata = google_photos_album_get_plugin_metadata();
 	if ( ! isset( $plugin_metadata['RequiresPHP'] ) || '' === $plugin_metadata['RequiresPHP'] ) {
 		$plugin_metadata['RequiresPHP'] = '8.3';
 	}
@@ -120,8 +120,8 @@ function a8csp_scaffold_validate_requirements() {
 		$plugin_metadata['RequiresWP'] = '6.7';
 	}
 
-	$is_php_compatible = a8csp_scaffold_is_php_version_compatible( $plugin_metadata['RequiresPHP'] );
-	$is_wp_compatible  = a8csp_scaffold_is_wp_version_compatible( $plugin_metadata['RequiresWP'] );
+	$is_php_compatible = google_photos_album_is_php_version_compatible( $plugin_metadata['RequiresPHP'] );
+	$is_wp_compatible  = google_photos_album_is_wp_version_compatible( $plugin_metadata['RequiresWP'] );
 
 	$wp_error = new \WP_Error();
 	if ( ! $is_wp_compatible ) {
@@ -141,19 +141,19 @@ function a8csp_scaffold_validate_requirements() {
  *
  * @return  void
  */
-function a8csp_scaffold_output_requirements_error( $error ) {
+function google_photos_album_output_requirements_error( $error ) {
 	add_action(
 		'admin_notices',
 		static function () use ( $error ) {
 			$requirements_error = \wp_sprintf(
 				/* translators: 1: Plugin name, 2: Plugin version */
-				__( '<strong>%1$s (version %2$s)</strong> could not be initialized.', 'a8csp-scaffold' ),
-				a8csp_scaffold_get_plugin_metadata( 'Name' ),
-				a8csp_scaffold_get_plugin_metadata( 'Version' )
+				__( '<strong>%1$s (version %2$s)</strong> could not be initialized.', 'google-photos-album' ),
+				google_photos_album_get_plugin_metadata( 'Name' ),
+				google_photos_album_get_plugin_metadata( 'Version' )
 			);
 
 			if ( $error->has_errors() ) {
-				$requirements_error .= ' ' . \__( 'Your environment does not meet all the system requirements listed below:', 'a8csp-scaffold' );
+				$requirements_error .= ' ' . \__( 'Your environment does not meet all the system requirements listed below:', 'google-photos-album' );
 				$requirements_error .= '<ul class="ul-disc">';
 
 				foreach ( $error->get_error_codes() as $error_code ) {
@@ -166,7 +166,7 @@ function a8csp_scaffold_output_requirements_error( $error ) {
 						case 'plugin_wp_incompatible':
 							$error_message = wp_sprintf(
 								/* translators: 1: Current WP version, 2: Minimum WP version */
-								__( 'Current <em>WordPress version (%1$s)</em> does not meet minimum required version of %2$s.', 'a8csp-scaffold' ),
+								__( 'Current <em>WordPress version (%1$s)</em> does not meet minimum required version of %2$s.', 'google-photos-album' ),
 								get_bloginfo( 'version' ),
 								$error_data['requires_wp']
 							);
@@ -174,13 +174,13 @@ function a8csp_scaffold_output_requirements_error( $error ) {
 						case 'plugin_php_incompatible':
 							$error_message = wp_sprintf(
 								/* translators: 1: Current PHP version, 2: Minimum PHP version */
-								__( 'Current <em>PHP version (%1$s)</em> does not meet minimum required version of %2$s.', 'a8csp-scaffold' ),
+								__( 'Current <em>PHP version (%1$s)</em> does not meet minimum required version of %2$s.', 'google-photos-album' ),
 								PHP_VERSION,
 								$error_data['requires_php']
 							);
 							break;
 						case 'missing_autoloader':
-							$error_message = __( 'The autoloader file is missing. Please run <code>composer install</code> to generate it.', 'a8csp-scaffold' );
+							$error_message = __( 'The autoloader file is missing. Please run <code>composer install</code> to generate it.', 'google-photos-album' );
 							break;
 						default:
 							$error_message = $error->get_error_message( $error_code );

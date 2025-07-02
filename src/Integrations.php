@@ -1,8 +1,8 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Scaffold;
+namespace A8C\SpecialProjects\google-photos-album;
 
-use A8C\SpecialProjects\Scaffold\Integrations\WC_Subscriptions;
+use A8C\SpecialProjects\google-photos-album\Integrations\WC_Subscriptions;
 
 defined( 'ABSPATH' ) || exit;
 

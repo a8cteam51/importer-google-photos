@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Scaffold;
+namespace A8C\SpecialProjects\google-photos-album;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -39,7 +39,7 @@ final class Blocks {
 	 * @return  void
 	 */
 	public function register_blocks(): void {
-		\register_block_type( \constant( 'A8CSP_SCAFFOLD_DIR_PATH' ) . 'blocks/build/foobar' );
+		\register_block_type( \constant( 'GOOGLE_PHOTOS_ALBUM_DIR_PATH' ) . 'blocks/build/foobar' );
 	}
 
 	/**
@@ -51,15 +51,15 @@ final class Blocks {
 	 * @return  void
 	 */
 	public function enqueue_block_editor_assets(): void {
-		$asset_meta = a8csp_scaffold_get_asset_meta( 'assets/js/build/editor.js' );
+		$asset_meta = google_photos_album_get_asset_meta( 'assets/js/build/editor.js' );
 		if ( \is_null( $asset_meta ) ) {
 			return;
 		}
 
-		$plugin_slug = a8csp_scaffold_get_plugin_slug();
+		$plugin_slug = google_photos_album_get_plugin_slug();
 		\wp_register_script(
 			"$plugin_slug-editor",
-			\constant( 'A8CSP_SCAFFOLD_DIR_URL' ) . 'assets/js/build/editor.js',
+			\constant( 'GOOGLE_PHOTOS_ALBUM_DIR_URL' ) . 'assets/js/build/editor.js',
 			$asset_meta['dependencies'],
 			$asset_meta['version'],
 			false
