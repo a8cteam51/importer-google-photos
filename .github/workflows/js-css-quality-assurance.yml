@@ -1,0 +1,29 @@
+name: JS+CSS Quality Assurance
+
+on:
+  push:
+    branches: [ trunk, develop ]
+  pull_request:
+    branches: [ trunk, develop ]
+
+jobs:
+  lint-js_css-files:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup proper Node.js version
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: 'package.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run JS linter
+        run: npm run lint:scripts
+
+      - name: Run CSS linter
+        run: npm run lint:styles
