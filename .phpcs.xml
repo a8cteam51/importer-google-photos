@@ -17,8 +17,9 @@
 		<properties>
 			<property name="prefixes" type="array">
 				<element value="a8csp_"/>
+				<element value="gpa_"/>
 				<element value="google_photos_album_"/>
-				<element value="A8C\SpecialProjects\google-photos-album"/>
+				<element value="A8C\SpecialProjects\GooglePhotosAlbum"/>
 			</property>
 		</properties>
 	</rule>

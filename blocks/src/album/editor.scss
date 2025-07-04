@@ -1,0 +1,20 @@
+/**
+ * The following styles get applied inside the editor only.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+.wp-block-google-photos-album-album {
+
+	.components-placeholder__fieldset {
+		flex-direction: column;
+
+		.import-progress {
+			margin: 0 auto;
+		}
+
+		.import-progress-bar {
+			margin-bottom: 16px;
+		}
+	}
+}

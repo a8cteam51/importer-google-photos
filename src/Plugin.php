@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\google-photos-album;
+namespace A8C\SpecialProjects\GooglePhotosAlbum;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -14,6 +14,7 @@ class Plugin {
 	// region FIELDS AND CONSTANTS
 
 	/**
+	 *
 	 * The blocks component.
 	 *
 	 * @since   1.0.0
@@ -24,14 +25,14 @@ class Plugin {
 	public ?Blocks $blocks = null;
 
 	/**
-	 * The integrations component.
+	 * The REST API component.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 *
-	 * @var     Integrations|null
+	 * @var     RestApi|null
 	 */
-	public ?Integrations $integrations = null;
+	public ?RestApi $rest_api = null;
 
 	// endregion
 
@@ -94,34 +95,6 @@ class Plugin {
 	}
 
 	/**
-	 * Returns true if all the plugin's dependencies are met.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  true|\WP_Error
-	 */
-	public function is_active(): bool|\WP_Error {
-		// Check if WooCommerce is active.
-		if ( ! \class_exists( 'WooCommerce' ) || ! \defined( 'WC_VERSION' ) ) {
-			return new \WP_Error( 'woocommerce_not_active', 'WooCommerce is not active.' );
-		}
-
-		// Get the minimum WooCommerce version required from the plugin's header, if needed.
-		$minimum_wc_version = google_photos_album_get_plugin_metadata( \WC_Plugin_Updates::VERSION_REQUIRED_HEADER );
-		if ( \is_null( $minimum_wc_version ) ) {
-			return true;
-		}
-
-		// Check if WooCommerce version is supported.
-		if ( ! \version_compare( WC_VERSION, $minimum_wc_version, '>=' ) ) {
-			return new \WP_Error( 'woocommerce_version_not_supported', \sprintf( 'WooCommerce version %s or newer is required.', $minimum_wc_version ) );
-		}
-
-		return true;
-	}
-
-	/**
 	 * Initializes the plugin components.
 	 *
 	 * @since   1.0.0
@@ -129,34 +102,12 @@ class Plugin {
 	 *
 	 * @return  void
 	 */
-	protected function initialize(): void {
+	public function initialize(): void {
 		$this->blocks = new Blocks();
 		$this->blocks->initialize();
 
-		$this->integrations = new Integrations();
-		$this->integrations->initialize();
-	}
-
-	// endregion
-
-	// region HOOKS
-
-	/**
-	 * Initializes the plugin components if WooCommerce is activated.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  void
-	 */
-	public function maybe_initialize(): void {
-		$is_active = $this->is_active();
-		if ( is_wp_error( $is_active ) ) {
-			google_photos_album_output_requirements_error( $is_active );
-			return;
-		}
-
-		$this->initialize();
+		$this->rest_api = new RestApi();
+		$this->rest_api->initialize();
 	}
 
 	// endregion

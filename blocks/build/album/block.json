@@ -1,0 +1,53 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "google-photos-album/album",
+  "version": "0.1.0",
+  "title": "Google Photos Album",
+  "category": "widgets",
+  "icon": "format-gallery",
+  "description": "Import your Google Photos album images into your WordPress site and display them in a beautiful gallery.",
+  "attributes": {
+    "albumUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "imported": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "allImages": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "supports": {
+    "anchor": true,
+    "align": true,
+    "html": false,
+    "spacing": {
+      "margin": true,
+      "padding": true
+    }
+  },
+  "allowedBlocks": [
+    "core/gallery"
+  ],
+  "textdomain": "google-photos-album",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css"
+}

@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\google-photos-album;
+namespace A8C\SpecialProjects\GooglePhotosAlbum;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -39,7 +39,7 @@ final class Blocks {
 	 * @return  void
 	 */
 	public function register_blocks(): void {
-		\register_block_type( \constant( 'GOOGLE_PHOTOS_ALBUM_DIR_PATH' ) . 'blocks/build/foobar' );
+		\register_block_type( \constant( 'GOOGLE_PHOTOS_ALBUM_DIR_PATH' ) . 'blocks/build/album' );
 	}
 
 	/**
@@ -63,13 +63,6 @@ final class Blocks {
 			$asset_meta['dependencies'],
 			$asset_meta['version'],
 			false
-		);
-		\wp_localize_script(
-			"$plugin_slug-editor",
-			'team51_donations',
-			array(
-				'ajax_url' => \admin_url( 'admin-ajax.php' ),
-			)
 		);
 	}
 

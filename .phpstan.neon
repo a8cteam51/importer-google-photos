@@ -1,6 +1,2 @@
 includes:
     - vendor/a8cteam51/team51-configs/quality-assurance/phpstan.dist.neon
-
-parameters:
-    scanDirectories:
-        - vendor/wpackagist-plugin/woocommerce

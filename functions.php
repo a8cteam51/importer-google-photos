@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-use A8C\SpecialProjects\google-photos-album\Plugin;
+use A8C\SpecialProjects\GooglePhotosAlbum\Plugin;
 
 defined( 'ABSPATH' ) || exit;
 
