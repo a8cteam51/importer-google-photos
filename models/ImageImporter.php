@@ -53,10 +53,19 @@ final class ImageImporter {
 			$content_type = $content_type[0] ?? '';
 		}
 
-		if ( ! $content_type || ! \wp_image_editor_supports( array( 'mime_type' => $content_type ) ) ) {
+		// Check if it's a valid image type
+		if ( ! $content_type || ! str_starts_with( $content_type, 'image/' ) ) {
 			return new \WP_Error(
-				'unsupported_format',
-				sprintf( 'Unsupported image format: %s.', $content_type )
+				'invalid_content_type',
+				sprintf( 'Invalid content type: %s.', $content_type )
+			);
+		}
+
+		if ( \wp_is_heic_image_mime_type( $content_type ) && ! \wp_image_editor_supports( array( 'mime_type' => $content_type ) ) ) {
+			return new \WP_Error(
+				'heic_not_supported',
+				'HEIC/HEIF images cannot be processed on this server. ' .
+				'Please convert the image to JPEG before importing, or ensure your server has ImageMagick with HEIC support.'
 			);
 		}
 

@@ -93,7 +93,7 @@ final class AlbumParser {
 	 * @return string[]
 	 */
 	private function get_cached_images(): array {
-		$cached = \get_transient( 'google_photos_album_' . md5( $this->url ) );
+		$cached = \get_transient( 'gpa_album_' . md5( $this->url ) );
 
 		if ( false !== $cached && \is_array( $cached ) ) {
 			return $cached;
@@ -102,7 +102,7 @@ final class AlbumParser {
 		$images = $this->extract_images();
 
 		if ( count( $images ) > 0 ) {
-			\set_transient( 'google_photos_album_' . md5( $this->url ), $images, HOUR_IN_SECONDS * 6 );
+			\set_transient( 'gpa_album_' . md5( $this->url ), $images, HOUR_IN_SECONDS * 6 );
 		}
 
 		return $images;
