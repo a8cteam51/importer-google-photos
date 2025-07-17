@@ -61,12 +61,14 @@ final class ImageImporter {
 			);
 		}
 
-		if ( \wp_is_heic_image_mime_type( $content_type ) && ! \wp_image_editor_supports( array( 'mime_type' => $content_type ) ) ) {
-			return new \WP_Error(
-				'heic_not_supported',
-				'HEIC/HEIF images cannot be processed on this server. ' .
-				'Please convert the image to JPEG before importing, or ensure your server has ImageMagick with HEIC support.'
-			);
+		if ( ! defined( 'IS_ATOMIC' ) || ! constant( 'IS_ATOMIC' ) ) {
+			if ( \wp_is_heic_image_mime_type( $content_type ) && ! \wp_image_editor_supports( array( 'mime_type' => $content_type ) ) ) {
+				return new \WP_Error(
+					'heic_not_supported',
+					'HEIC/HEIF images cannot be processed on this server. ' .
+					'Please convert the image to JPEG before importing, or ensure your server has ImageMagick with HEIC support.'
+				);
+			}
 		}
 
 		return array(
