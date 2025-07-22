@@ -51,8 +51,8 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 	/**
 	 * Creates and inserts a gallery block with the imported images.
 	 *
-	 * @param {Array} importedImages - Array of successfully imported image objects.
-	 * @param {number} importedImages[].id - WordPress media ID.
+	 * @param {Array}  importedImages       - Array of successfully imported image objects.
+	 * @param {number} importedImages[].id  - WordPress media ID.
 	 * @param {string} importedImages[].url - Image URL.
 	 */
 	const insertGalleryBlock = ( importedImages ) => {
@@ -120,7 +120,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 	 * Informs the user about both successful and failed imports.
 	 *
 	 * @param {number} successCount - Number of successfully imported images.
-	 * @param {number} failedCount - Number of images that failed to import.
+	 * @param {number} failedCount  - Number of images that failed to import.
 	 */
 	const showPartialImportNotice = ( successCount, failedCount ) => {
 		createErrorNotice(
@@ -145,7 +145,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 	 * Determines the appropriate action based on success/failure rates.
 	 *
 	 * @param {number} importedCount - Number of successfully imported images.
-	 * @param {number} failedCount - Number of images that failed to import.
+	 * @param {number} failedCount   - Number of images that failed to import.
 	 */
 	const handleImportCompletion = ( importedCount, failedCount ) => {
 		setDone( true );
@@ -171,16 +171,16 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 	 * Handles the failure of a single image import.
 	 * Updates the failed imports list and checks if all processing is complete.
 	 *
-	 * @param {string} imageUrl - The URL of the image that failed to import.
-	 * @param {Error} error - The error object from the failed import.
-	 * @param {Array} updatedFailedImports - Updated array of failed import objects.
+	 * @param {string} imageUrl             - The URL of the image that failed to import.
+	 * @param {Error}  importError          - The error object from the failed import.
+	 * @param {Array}  updatedFailedImports - Updated array of failed import objects.
 	 */
 	const handleSingleImageFailure = (
 		imageUrl,
-		error,
+		importError,
 		updatedFailedImports
 	) => {
-		console.error( 'Import failed for image:', imageUrl, error );
+		console.error( 'Import failed for image:', imageUrl, importError ); // eslint-disable-line no-console -- Enabling during MVP
 		setFailedImports( updatedFailedImports );
 
 		// Check if we're done processing all images
@@ -250,7 +250,9 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 	};
 
 	useEffect( () => {
-		if ( ! isImporting || ! allImages.length || done ) return;
+		if ( ! isImporting || ! allImages.length || done ) {
+			return;
+		}
 
 		// Find the next image that hasn't been imported yet or failed
 		// Compare using original_url field from imported items and failed imports
@@ -301,7 +303,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 						}
 					} else if ( result.queued ) {
 						// Handle async import - for now, just continue
-						console.log( 'Image queued for async import' );
+						console.log( 'Image queued for async import' ); // eslint-disable-line no-console -- Enabling during MVP
 					}
 				} )
 				.catch( ( err ) => {
@@ -362,7 +364,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 									setAttributes( { albumUrl: value } )
 								}
 								placeholder={ __(
-									'https://photos.app.goo.gl/...',
+									'https://photos.app.goo.gl/…',
 									'google-photos-album'
 								) }
 								disabled={ isImporting || loading }

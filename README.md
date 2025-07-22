@@ -41,7 +41,8 @@ Google Photos Album is a WordPress plugin that allows you to easily import image
 ### Album URL Format
 
 The plugin works with public Google Photos album URLs that look like:
-```
+
+```text
 https://photos.app.goo.gl/XXXXXXXXXXXXXXXXX
 ```
 

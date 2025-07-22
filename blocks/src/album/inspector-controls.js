@@ -25,6 +25,7 @@ export default function AlbumInspectorControls( {
 				<PanelRow>
 					<BaseControl
 						label={ __( 'Album URL', 'google-photos-album' ) }
+						id="album-url"
 						help={
 							shouldShowAlbumUrl && albumUrl ? (
 								<ExternalLink href={ albumUrl }>
@@ -44,6 +45,7 @@ export default function AlbumInspectorControls( {
 								'Import Status',
 								'google-photos-album'
 							) }
+							id="import-status"
 						>
 							<span>
 								{ isImportInProgress
