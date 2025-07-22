@@ -39,6 +39,7 @@ final class ImageImporter {
 	 * @param string $url Image URL.
 	 *
 	 * @return array|\WP_Error Array with response and content_type, or WP_Error on failure.
+	 * @phpstan-return array{response: array<string, mixed>, content_type: string}|\WP_Error
 	 */
 	private static function validate_image_response( string $url ): array|\WP_Error {
 		$response = \wp_safe_remote_head( $url . '=d' );
@@ -82,6 +83,7 @@ final class ImageImporter {
 	 *
 	 * @param array  $response     HTTP response array.
 	 * @param string $content_type Content type for fallback filename.
+	 * @phpstan-param array<string, mixed> $response
 	 *
 	 * @return string Sanitized filename.
 	 */

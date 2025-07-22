@@ -18,6 +18,7 @@ final class AsyncImportStrategy implements ImportStrategy {
 	 * {@inheritDoc}
 	 */
 	public function import( string $url, int $post_id = 0 ): int|true|\WP_Error {
+		/* @phpstan-ignore function.notFound */
 		\as_enqueue_async_action(
 			'gpa/import_image',
 			array(

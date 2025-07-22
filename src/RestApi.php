@@ -110,6 +110,7 @@ final class RestApi {
 	 * @version 1.0.0
 	 *
 	 * @param   \WP_REST_Request $request The request object.
+	 * @phpstan-param \WP_REST_Request<array<string, mixed>> $request
 	 *
 	 * @return  \WP_REST_Response Array with image URLs if valid, otherwise an error.
 	 */
@@ -137,6 +138,7 @@ final class RestApi {
 	 * @version 1.0.0
 	 *
 	 * @param   \WP_REST_Request $request The request object.
+	 * @phpstan-param \WP_REST_Request<array<string, mixed>> $request
 	 *
 	 * @return  \WP_REST_Response
 	 */
@@ -173,7 +175,7 @@ final class RestApi {
 			'original_url' => $url, // Store the original Google Photos URL
 		);
 
-		if ( $album_url ) {
+		if ( ! is_null( $album_url ) ) {
 			$option_key = $this->get_option_key( $album_url );
 			$existing   = (array) get_option( $option_key, array() );
 			$existing[] = $data;
