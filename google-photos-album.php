@@ -14,7 +14,7 @@
  * Plugin Name:             Google Photos Album
  * Plugin URI:              https://wpspecialprojects.wordpress.com
  * Description:             Import your Google Photos album images into your WordPress site and display them in a beautiful gallery.
- * Version:                 1.0.0-beta.1
+ * Version:                 1.0.0-beta.2
  * Requires at least:       6.7
  * Tested up to:            6.7
  * Requires PHP:            8.2
