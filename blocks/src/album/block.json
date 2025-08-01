@@ -42,7 +42,6 @@
 			"padding": true
 		}
 	},
-	"allowedBlocks": [ "core/gallery" ],
 	"textdomain": "google-photos-album",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css"

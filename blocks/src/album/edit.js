@@ -12,6 +12,7 @@ import {
 	Flex,
 	FlexItem,
 	ExternalLink,
+	ToolbarButton,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -19,6 +20,7 @@ import {
 	store as blockEditorStore,
 	InnerBlocks,
 	useBlockProps,
+	BlockControls,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import apiFetch from '@wordpress/api-fetch';
@@ -259,6 +261,66 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 			} );
 	};
 
+	/**
+	 * Re-syncs the album by fetching fresh images and importing only new ones.
+	 * Resets the UI to show the import process as if it's a fresh block.
+	 */
+	const reSyncAlbum = () => {
+		if ( ! albumUrl || isImporting || loading ) {
+			return;
+		}
+
+		// Reset the block state to look like a fresh import
+		setAttributes( {
+			allImages: [],
+			importCompleted: false,
+		} );
+		setError( '' );
+		setLoading( true );
+		setDone( false );
+		setIsImporting( false );
+		setFailedImports( [] );
+
+		// Call the same verify endpoint to get fresh album data
+		apiFetch( {
+			path: addQueryArgs( '/google-photos-album/v1/album/verify', {
+				url: albumUrl,
+			} ),
+		} )
+			.then( ( response ) => {
+				if ( response.valid && response.images.length > 0 ) {
+					setAttributes( {
+						albumUrl,
+						allImages: response.images,
+						imported: response.imported || [],
+					} );
+
+					// Start importing immediately after verify (only new images will be processed)
+					setIsImporting( true );
+				} else {
+					setError(
+						__(
+							'No valid images found in this album.',
+							'google-photos-album'
+						)
+					);
+				}
+			} )
+			.catch( ( err ) => {
+				setError(
+					sprintf(
+						/* translators: %s: error message */
+						__( 'Re-sync failed: %s', 'google-photos-album' ),
+						err.message ||
+							__( 'Unknown error', 'google-photos-album' )
+					)
+				);
+			} )
+			.finally( () => {
+				setLoading( false );
+			} );
+	};
+
 	useEffect( () => {
 		if ( ! isImporting || ! allImages.length || done ) {
 			return;
@@ -346,6 +408,20 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 				allImages={ allImages }
 				imported={ imported }
 			/>
+
+			{ importCompleted && albumUrl && (
+				<BlockControls>
+					<ToolbarButton
+						icon="update"
+						label={
+							isImporting || loading
+								? __( 'Resyncing…', 'google-photos-album' )
+								: __( 'Re-sync', 'google-photos-album' )
+						}
+						onClick={ reSyncAlbum }
+					/>
+				</BlockControls>
+			) }
 
 			{ ! importCompleted && (
 				<Placeholder
@@ -451,12 +527,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 				</Placeholder>
 			) }
 
-			{ importCompleted && (
-				<InnerBlocks
-					allowedBlocks={ [ 'core/gallery' ] }
-					renderAppender={ false }
-				/>
-			) }
+			{ importCompleted && <InnerBlocks renderAppender={ false } /> }
 		</div>
 	);
 }

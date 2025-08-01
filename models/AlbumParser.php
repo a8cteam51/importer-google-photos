@@ -42,7 +42,7 @@ final class AlbumParser {
 	 */
 	public function __construct( string $url ) {
 		$this->url    = \esc_url_raw( $url );
-		$this->images = $this->get_cached_images();
+		$this->images = $this->extract_images();
 	}
 
 	/**
@@ -84,29 +84,7 @@ final class AlbumParser {
 		return array_values( array_unique( $normalized ) );
 	}
 
-	/**
-	 * Get the cached images.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return string[]
-	 */
-	private function get_cached_images(): array {
-		$cached = \get_transient( 'gpa_album_' . md5( $this->url ) );
 
-		if ( false !== $cached && \is_array( $cached ) ) {
-			return $cached;
-		}
-
-		$images = $this->extract_images();
-
-		if ( count( $images ) > 0 ) {
-			\set_transient( 'gpa_album_' . md5( $this->url ), $images, HOUR_IN_SECONDS * 6 );
-		}
-
-		return $images;
-	}
 
 	/**
 	 * Get the images in the album.
