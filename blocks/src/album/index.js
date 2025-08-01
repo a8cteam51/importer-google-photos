@@ -3,7 +3,7 @@
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
-import { registerBlockType } from '@wordpress/blocks';
+import { registerBlockType, createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -27,4 +27,27 @@ registerBlockType( metadata.name, {
 	 * @see ./save.js
 	 */
 	save,
+
+	/**
+	 * Block transforms
+	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-transforms/
+	 */
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				// Match Google Photos album URLs when pasted
+				isMatch: ( node ) =>
+					node.nodeName === 'P' &&
+					/^\s*(https?:\/\/photos\.app\.goo\.gl\/[a-zA-Z0-9]+)\s*$/i.test(
+						node.textContent
+					),
+				transform: ( node ) => {
+					return createBlock( metadata.name, {
+						albumUrl: node.textContent.trim(),
+					} );
+				},
+			},
+		],
+	},
 } );
