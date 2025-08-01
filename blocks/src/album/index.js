@@ -39,7 +39,7 @@ registerBlockType( metadata.name, {
 				// Match Google Photos album URLs when pasted
 				isMatch: ( node ) =>
 					node.nodeName === 'P' &&
-					/^\s*(https?:\/\/photos\.app\.goo\.gl\/[a-zA-Z0-9]+)\s*$/i.test(
+					/^\s*(https?:\/\/photos\.app\.goo\.gl\/[a-z0-9]+)\s*$/i.test(
 						node.textContent
 					),
 				transform: ( node ) => {
