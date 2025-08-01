@@ -1,4 +1,8 @@
-import { useState, useEffect } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	createInterpolateElement,
+} from '@wordpress/element';
 import {
 	Placeholder,
 	TextControl,
@@ -7,6 +11,7 @@ import {
 	ProgressBar,
 	Flex,
 	FlexItem,
+	ExternalLink,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -350,7 +355,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 						'google-photos-album'
 					) }
 					instructions={ __(
-						'Paste a public album URL to begin importing images.',
+						'Paste a public album URL to begin importing images. This is the URL you get through Share > Copy link.',
 						'google-photos-album'
 					) }
 				>
@@ -368,6 +373,17 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 								placeholder={ __(
 									'https://photos.app.goo.gl/…',
 									'google-photos-album'
+								) }
+								help={ createInterpolateElement(
+									__(
+										'See <link>Google Photos Help</link> for how to get your public link.',
+										'google-photos-album'
+									),
+									{
+										link: (
+											<ExternalLink href="https://support.google.com/photos/answer/6131416" />
+										),
+									}
 								) }
 								disabled={ isImporting || loading }
 							/>
