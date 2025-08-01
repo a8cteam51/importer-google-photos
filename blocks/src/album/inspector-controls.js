@@ -14,7 +14,7 @@ export default function AlbumInspectorControls( {
 } ) {
 	const hasImportedImages = imported.length > 0;
 	const isImportInProgress = allImages.length > 0;
-	const shouldShowAlbumUrl = hasImportedImages || albumUrl;
+	const shouldShowAlbumUrl = hasImportedImages;
 
 	return (
 		<InspectorControls>
@@ -28,7 +28,10 @@ export default function AlbumInspectorControls( {
 						id="album-url"
 						help={
 							shouldShowAlbumUrl && albumUrl ? (
-								<ExternalLink href={ albumUrl }>
+								<ExternalLink
+									className="album-url"
+									href={ albumUrl }
+								>
 									{ albumUrl }
 								</ExternalLink>
 							) : (

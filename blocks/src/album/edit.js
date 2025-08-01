@@ -30,7 +30,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 	const [ isImporting, setIsImporting ] = useState( false );
 	const [ failedImports, setFailedImports ] = useState( [] );
 
-	const { albumUrl, allImages = [], imported = [] } = attributes;
+	const { albumUrl, allImages, imported, importCompleted } = attributes;
 	const postId = useSelect(
 		( select ) => select( 'core/editor' ).getCurrentPostId(),
 		[]
@@ -84,6 +84,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 		setAttributes( {
 			allImages: [],
 			imported: [],
+			importCompleted: false,
 		} );
 		setFailedImports( [] );
 		setDone( false );
@@ -159,6 +160,9 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 			// Some or all imports succeeded
 			insertGalleryBlock( imported );
 
+			// Mark import as completed
+			setAttributes( { importCompleted: true } );
+
 			if ( failedCount > 0 ) {
 				showPartialImportNotice( importedCount, failedCount );
 			}
@@ -221,6 +225,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 					) {
 						setDone( true );
 						insertGalleryBlock( response.imported );
+						setAttributes( { importCompleted: true } );
 					} else {
 						// Start importing immediately after verify
 						setIsImporting( true );
@@ -329,9 +334,6 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 		albumUrl,
 	] ); // Updated dependencies
 
-	// Show placeholder only when no images are imported or import is in progress
-	const isImportComplete = imported.length > 0 && allImages.length === 0;
-
 	return (
 		<div { ...blockProps }>
 			<AlbumInspectorControls
@@ -340,7 +342,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 				imported={ imported }
 			/>
 
-			{ ! isImportComplete && (
+			{ ! importCompleted && (
 				<Placeholder
 					icon="format-gallery"
 					label={ __(
@@ -433,10 +435,12 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 				</Placeholder>
 			) }
 
-			<InnerBlocks
-				allowedBlocks={ [ 'core/gallery' ] }
-				renderAppender={ false }
-			/>
+			{ importCompleted && (
+				<InnerBlocks
+					allowedBlocks={ [ 'core/gallery' ] }
+					renderAppender={ false }
+				/>
+			) }
 		</div>
 	);
 }
