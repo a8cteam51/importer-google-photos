@@ -64,6 +64,8 @@ final class Blocks {
 			$asset_meta['version'],
 			false
 		);
+
+		\wp_enqueue_script( "$plugin_slug-editor" );
 	}
 
 	// endregion
