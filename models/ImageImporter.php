@@ -20,93 +20,11 @@ final class ImageImporter {
 	 * @return int|\WP_Error Attachment ID or WP_Error on failure.
 	 */
 	public static function import_single_image( string $url, int $post_id = 0 ): int|\WP_Error {
-		$validation_result = self::validate_image_response( $url );
-		if ( \is_wp_error( $validation_result ) ) {
-			return $validation_result;
-		}
+		$item = new AlbumItem( $url );
 
-		$content_type = $validation_result['content_type'];
-		$response     = $validation_result['response'];
-
-		$file_name = self::extract_filename( $response, $content_type );
+		$file_name = $item->get_filename();
 
 		return self::download_and_import( $url, $file_name, $post_id );
-	}
-
-	/**
-	 * Validate the image response and content type.
-	 *
-	 * @param string $url Image URL.
-	 *
-	 * @return array|\WP_Error Array with response and content_type, or WP_Error on failure.
-	 * @phpstan-return array{response: array<string, mixed>, content_type: string}|\WP_Error
-	 */
-	private static function validate_image_response( string $url ): array|\WP_Error {
-		$response = \wp_safe_remote_head( $url . '=d' );
-
-		if ( \is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$content_type = \wp_remote_retrieve_header( $response, 'content-type' );
-
-		if ( is_array( $content_type ) ) {
-			$content_type = $content_type[0] ?? '';
-		}
-
-		// Check if it's a valid image type
-		if ( ! $content_type || ! str_starts_with( $content_type, 'image/' ) ) {
-			return new \WP_Error(
-				'invalid_content_type',
-				sprintf( 'Invalid content type: %s.', $content_type )
-			);
-		}
-
-		if ( ! defined( 'IS_ATOMIC' ) || ! constant( 'IS_ATOMIC' ) ) {
-			if ( \wp_is_heic_image_mime_type( $content_type ) && ! \wp_image_editor_supports( array( 'mime_type' => $content_type ) ) ) {
-				return new \WP_Error(
-					'heic_not_supported',
-					'HEIC/HEIF images cannot be processed on this server. ' .
-					'Please convert the image to JPEG before importing, or ensure your server has ImageMagick with HEIC support.'
-				);
-			}
-		}
-
-		return array(
-			'response'     => $response,
-			'content_type' => $content_type,
-		);
-	}
-
-	/**
-	 * Extract and sanitize filename from response headers.
-	 *
-	 * @param array  $response     HTTP response array.
-	 * @param string $content_type Content type for fallback filename.
-	 * @phpstan-param array<string, mixed> $response
-	 *
-	 * @return string Sanitized filename.
-	 */
-	private static function extract_filename( array $response, string $content_type ): string {
-		$file_name = \wp_remote_retrieve_header( $response, 'content-disposition' );
-		$prefix    = 'attachment;filename="';
-		$suffix    = '"';
-
-		// Ensure we have a string (wp_remote_retrieve_header can return array)
-		if ( is_array( $file_name ) ) {
-			$file_name = $file_name[0] ?? '';
-		}
-
-		if ( is_string( $file_name ) && str_starts_with( $file_name, $prefix ) && str_ends_with( $file_name, $suffix ) ) {
-			$file_name = substr( $file_name, strlen( $prefix ), -strlen( $suffix ) );
-			$file_name = \sanitize_file_name( $file_name );
-		}
-
-		if ( ! $file_name ) {
-			$file_name = \wp_generate_password( 8, false ) . '.' . \wp_get_default_extension_for_mime_type( $content_type );
-		}
-
-		return $file_name;
 	}
 
 	/**
@@ -123,7 +41,7 @@ final class ImageImporter {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
-		$tmp_file = \download_url( $url . '=d' );
+		$tmp_file = \download_url( $url );
 
 		if ( \is_wp_error( $tmp_file ) ) {
 			return $tmp_file;

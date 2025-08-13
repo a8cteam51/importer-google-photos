@@ -36,8 +36,35 @@ readonly class Album {
 	 */
 	public function get_media_download_urls(): array {
 		return array_map(
-			fn ( AlbumItem $item ) => $item->get_download_url(),
+			fn ( AlbumItem $item ) => $item->download_url,
 			$this->items
 		);
+	}
+
+	/**
+	 * Get the images in the album.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return string[]
+	 */
+	public function get_image_urls(): array {
+		return array_map(
+			fn ( AlbumItem $item ) => $item->url,
+			$this->items
+		);
+	}
+
+	/**
+	 * Get the images in the album.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return AlbumItem[]
+	 */
+	public function get_images(): array {
+		return $this->items;
 	}
 }
