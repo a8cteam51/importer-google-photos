@@ -1,4 +1,8 @@
 .gpa-modal {
+	.components-modal__content:has(.gpa-modal__content.is-busy) {
+		pointer-events: none;
+	}
+
 	.gpa-modal__body {
 		display: flex;
 		flex-direction: column;
@@ -11,6 +15,11 @@
 			display: flex;
 			flex: 1;
 			flex-direction: column;
+
+			&.is-busy {
+				pointer-events: none;
+				opacity: .6;
+			}
 
 			.gpa-modal__grid {
 				display: grid;

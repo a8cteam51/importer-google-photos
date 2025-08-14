@@ -9,6 +9,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 	const [ error, setError ] = useState( '' );
 	const [ images, setImages ] = useState( [] );
 	const [ selected, setSelected ] = useState( {} );
+	const [ importing, setImporting ] = useState( false );
 
 	const hasSelection = useMemo(
 		() => Object.values( selected ).some( Boolean ),
@@ -55,9 +56,12 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 		const urls = images
 			.filter( ( img ) => img && img.url && selected[ img.url ] )
 			.map( ( img ) => img.url );
+
 		if ( ! urls.length ) {
 			return;
 		}
+
+		setImporting( true );
 		onInsert( { albumUrl, urls } );
 	};
 
@@ -69,10 +73,14 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 		<Modal
 			isFullScreen={ true }
 			className="gpa-modal"
-			title={ __(
-				'Select images from Google Photos album',
-				'google-photos-album'
-			) }
+			title={
+				importing
+					? __( 'Inserting media', 'google-photos-album' )
+					: __(
+							'Select images from Google Photos album',
+							'google-photos-album'
+					  )
+			}
 			onRequestClose={ onClose }
 		>
 			<div className="gpa-modal__body">
@@ -93,7 +101,11 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 					</Button>
 					{ error && <p className="gpa-modal__error">{ error }</p> }
 				</div>
-				<div className="gpa-modal__content">
+				<div
+					className={ `gpa-modal__content${
+						importing ? ' is-busy' : ''
+					}` }
+				>
 					{ images.length > 0 && (
 						<Composite
 							role="listbox"
@@ -149,12 +161,15 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 							<Button
 								variant="primary"
 								onClick={ insert }
-								disabled={ ! hasSelection }
+								disabled={ ! hasSelection || importing }
+								isBusy={ importing }
 							>
-								{ __(
-									'Insert selected images',
-									'google-photos-album'
-								) }
+								{ importing
+									? __( 'Inserting…', 'google-photos-album' )
+									: __(
+											'Insert selected images',
+											'google-photos-album'
+									  ) }
 							</Button>
 						</div>
 					) }
