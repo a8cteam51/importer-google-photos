@@ -41,8 +41,7 @@
       "A8C\\SpecialProjects\\GooglePhotosAlbum\\": "src/"
     },
     "classmap": [
-      "models/",
-      "contracts/"
+      "models/"
     ]
   },
   "autoload-dev": {
