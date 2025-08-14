@@ -66,6 +66,13 @@ final class Blocks {
 		);
 
 		\wp_enqueue_script( "$plugin_slug-editor" );
+
+		\wp_enqueue_style(
+			"$plugin_slug-mediaupload-hook",
+			\constant( 'GOOGLE_PHOTOS_ALBUM_DIR_URL' ) . 'assets/js/build/style-editor.css',
+			array(),
+			(string) \filemtime( \constant( 'GOOGLE_PHOTOS_ALBUM_DIR_PATH' ) . 'assets/js/build/style-editor.css' )
+		);
 	}
 
 	// endregion

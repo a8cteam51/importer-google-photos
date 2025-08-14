@@ -1,231 +1,123 @@
-/* global wp */
-
 import { addFilter } from '@wordpress/hooks';
-import { createHigherOrderComponent } from '@wordpress/compose';
-import { Fragment, useState, useMemo } from '@wordpress/element';
-import {
-	Modal,
-	Button,
-	TextControl,
-	Spinner,
-	CheckboxControl,
-	Flex,
-	FlexItem,
-} from '@wordpress/components';
+import { Fragment, useState } from '@wordpress/element';
+import { useBlockEditContext } from '@wordpress/block-editor';
+import { Button } from '@wordpress/components';
+import GooglePhotosIcon from './components/GooglePhotosIcon';
 import { __ } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
-import { createBlock } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import apiFetch from '@wordpress/api-fetch';
+import GooglePhotosAlbumModal from './components/GooglePhotosAlbumModal';
 
-const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
-	const [ albumUrl, setAlbumUrl ] = useState( '' );
-	const [ loading, setLoading ] = useState( false );
-	const [ error, setError ] = useState( '' );
-	const [ images, setImages ] = useState( [] );
-	const [ selected, setSelected ] = useState( {} );
+import './style.scss';
 
-	const hasSelection = useMemo( () => {
-		return Object.values( selected ).some( Boolean );
-	}, [ selected ] );
+function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
+	const [ isOpen, setIsOpen ] = useState( false );
+	const postId = useSelect(
+		( select ) => select( 'core/editor' ).getCurrentPostId(),
+		[]
+	);
 
-	const toggleSelect = ( url ) => {
-		setSelected( ( prev ) => ( {
-			...prev,
-			[ url ]: ! prev[ url ],
-		} ) );
-	};
-
-	const verify = () => {
-		setError( '' );
-		setLoading( true );
-		apiFetch( {
-			path: `/google-photos-album/v1/album/verify?url=${ encodeURIComponent( albumUrl ) }`,
-		} )
-			.then( ( response ) => {
-				if ( response?.valid && response?.images?.length ) {
-					setImages( response.images );
-					setSelected( {} );
-				} else {
-					setImages( [] );
-					setError( __( 'No valid images found in this album.', 'google-photos-album' ) );
+	const onInsert = async ( { albumUrl, urls } ) => {
+		const imported = [];
+		for ( const url of urls ) {
+			try {
+				// eslint-disable-next-line no-await-in-loop
+				const result = await apiFetch( {
+					path: '/google-photos-album/v1/album/import',
+					method: 'POST',
+					data: {
+						image_url: url,
+						post_id: postId,
+						album_url: albumUrl,
+					},
+				} );
+				if ( result?.success && ! result?.queued ) {
+					imported.push( { id: result.id, url: result.url } );
 				}
-			} )
-			.catch( ( err ) => {
-				setError( err?.message || __( 'Unknown error', 'google-photos-album' ) );
-			} )
-			.finally( () => setLoading( false ) );
-	};
-
-	const insert = () => {
-		const urls = images.filter( ( u ) => selected[ u ] );
-		if ( ! urls.length ) {
-			return;
+			} catch ( e ) {}
 		}
-		onInsert( { albumUrl, urls } );
+		if ( imported.length ) {
+			const mediaItems = imported.map( ( img ) => ( {
+				id: img.id,
+				url: img.url,
+				type: 'image',
+				alt: '',
+				caption: '',
+				sizes: {
+					thumbnail: { url: img.url },
+					large: { url: img.url },
+				},
+			} ) );
+			if ( typeof mediaProps.onSelect === 'function' ) {
+				const shouldPassArray = !! mediaProps.multiple;
+				mediaProps.onSelect(
+					shouldPassArray ? mediaItems : mediaItems[ 0 ]
+				);
+			}
+		}
+		setIsOpen( false );
 	};
 
-	if ( ! isOpen ) {
-		return null;
-	}
+	const original = originalRender ? originalRender( button ) : null;
 
 	return (
-		<Modal
-			title={ __( 'Select images from Google Photos album', 'google-photos-album' ) }
-			onRequestClose={ onClose }
-			size="large"
-		>
-			<Flex direction="column" gap={ 4 }>
-				<FlexItem>
-					<TextControl
-						label={ __( 'Album URL', 'google-photos-album' ) }
-						value={ albumUrl }
-						onChange={ setAlbumUrl }
-						placeholder={ 'https://photos.app.goo.gl/…' }
+		<Fragment>
+			{ original }
+			<Button
+				__next40pxDefaultSize={ true }
+				variant="secondary"
+				icon={
+					<GooglePhotosIcon
+						className="components-menu-items__item-icon"
+						size={ 20 }
 					/>
-				</FlexItem>
-				<FlexItem>
-					<Button
-						variant="secondary"
-						onClick={ verify }
-						disabled={ ! albumUrl || loading }
-					>
-						{ loading ? <Spinner /> : __( 'Load album', 'google-photos-album' ) }
-					</Button>
-				</FlexItem>
-				{ error && (
-					<FlexItem>
-						<p style={ { color: 'var(--wp-components-color-foreground, #cc1818)' } }>
-							{ error }
-						</p>
-					</FlexItem>
-				) }
-				{ images.length > 0 && (
-					<Flex direction="column" gap={ 2 }>
-						<FlexItem>
-							<div
-								style={ {
-									display: 'grid',
-									gap: 12,
-									gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-								} }
-							>
-								{ images.map( ( url ) => (
-									<div key={ url }>
-										<label style={ { cursor: 'pointer' } }>
-											<img
-												src={ url }
-												alt=""
-												style={ {
-													width: '100%',
-													height: 100,
-													objectFit: 'cover',
-													borderRadius: 4,
-													border: selected[ url ] ? '3px solid var(--wp-admin-theme-color)' : '1px solid rgba(0,0,0,.1)',
-												} }
-											/>
-											<CheckboxControl
-												__nextHasNoMarginBottom
-												checked={ !! selected[ url ] }
-												onChange={ () => toggleSelect( url ) }
-												label={ __( 'Select', 'google-photos-album' ) }
-											/>
-										</label>
-									</div>
-								) ) }
-							</div>
-						</FlexItem>
-						<FlexItem>
-							<Button
-								variant="primary"
-								onClick={ insert }
-								disabled={ ! hasSelection }
-							>
-								{ __( 'Insert selected images', 'google-photos-album' ) }
-							</Button>
-						</FlexItem>
-					</Flex>
-				) }
-			</Flex>
-		</Modal>
-	);
-};
-
-const withGpaGallerySelect = createHigherOrderComponent( ( BlockEdit ) => {
-	return ( props ) => {
-		if ( props.name !== 'core/gallery' ) {
-			return <BlockEdit { ...props } />;
-		}
-
-		const [ isOpen, setIsOpen ] = useState( false );
-		const postId = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostId(), [] );
-
-		const open = () => setIsOpen( true );
-		const close = () => setIsOpen( false );
-
-		const insertFromUrls = async ( { albumUrl, urls } ) => {
-			const imported = [];
-			for ( const url of urls ) {
-				try {
-					// Import into Media Library
-					// eslint-disable-next-line no-await-in-loop
-					const result = await apiFetch( {
-						path: '/google-photos-album/v1/album/import',
-						method: 'POST',
-						data: {
-							url,
-							post_id: postId,
-							album_url: albumUrl,
-						},
-					} );
-
-					if ( result?.success && ! result?.queued ) {
-						imported.push( { id: result.id, url: result.url } );
-					}
-				} catch ( e ) {
-					// Skip failed import for MVP.
 				}
-			}
+				onClick={ () => setIsOpen( true ) }
+			>
+				{ __( 'Google Photos Album', 'google-photos-album' ) }
+			</Button>
+			<GooglePhotosAlbumModal
+				isOpen={ isOpen }
+				onClose={ () => setIsOpen( false ) }
+				onInsert={ onInsert }
+			/>
+		</Fragment>
+	);
+}
 
-			if ( imported.length ) {
-				const galleryBlock = createBlock(
-					'core/gallery',
-					{
-						ids: imported.map( ( img ) => img.id ),
-						images: imported.map( ( img ) => ( { id: img.id, url: img.url } ) ),
-					},
-					imported.map( ( img ) =>
-						createBlock( 'core/image', { id: img.id, url: img.url, alt: '' } )
-					)
-				);
-				wp.data
-					.dispatch( 'core/block-editor' )
-					.replaceBlocks( props.clientId, [ galleryBlock ] );
-			}
-
-			close();
-		};
-
-		const hasImages = Array.isArray( props.attributes?.images ) && props.attributes.images.length > 0;
-		const hasIds = Array.isArray( props.attributes?.ids ) && props.attributes.ids.length > 0;
-
-		return (
-			<Fragment>
-				<BlockEdit { ...props } />
-				{ ! hasImages && ! hasIds && (
-					<div style={ { marginTop: 8 } }>
-						<Button variant="secondary" onClick={ open }>
-							{ __( 'Select images from Google Photos album', 'google-photos-album' ) }
-						</Button>
-						<GooglePhotosAlbumModal
-							isOpen={ isOpen }
-							onClose={ close }
-							onInsert={ insertFromUrls }
-						/>
-					</div>
-				) }
-			</Fragment>
-		);
-	};
-}, 'withGpaGallerySelect' );
-
-addFilter( 'editor.BlockEdit', 'google-photos-album/gallery-select', withGpaGallerySelect );
+// Augment the MediaUpload render to append our button next to the default placeholder button(s).
+addFilter(
+	'editor.MediaUpload',
+	'google-photos-album/mediaupload-hook',
+	( OriginalComponent ) => ( props ) => {
+		const { name } = useBlockEditContext();
+		const { render: originalRender } = props;
+		const allowedTypes = props.allowedTypes || [];
+		const gallery = !! props.gallery;
+		const value = props.value || [];
+		const isBrowse = props?.mode === 'browse';
+		const isAllowedBlock = [
+			'core/cover',
+			'core/image',
+			'core/gallery',
+			'core/media-text',
+		].includes( name );
+		const shouldAugment =
+			isBrowse &&
+			isAllowedBlock &&
+			allowedTypes.includes( 'image' ) &&
+			! ( gallery && Array.isArray( value ) && value.length > 0 );
+		if ( shouldAugment ) {
+			const render = ( button ) => (
+				<ExtraGooglePhotosButton
+					originalRender={ originalRender }
+					mediaProps={ props }
+					button={ button }
+				/>
+			);
+			return <OriginalComponent { ...props } render={ render } />;
+		}
+		return <OriginalComponent { ...props } />;
+	},
+	50
+);
