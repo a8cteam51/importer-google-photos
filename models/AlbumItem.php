@@ -65,15 +65,15 @@ readonly class AlbumItem {
 	 * @return string
 	 */
 	public function get_filename(): string {
-		$response = \wp_safe_remote_head( $this->download_url );
+		$file_name = '';
+		$response  = \wp_safe_remote_head( $this->download_url );
 
-		if ( \is_wp_error( $response ) ) {
-			return '';
+		if ( ! \is_wp_error( $response ) ) {
+			$file_name = \wp_remote_retrieve_header( $response, 'content-disposition' );
 		}
 
-		$file_name = \wp_remote_retrieve_header( $response, 'content-disposition' );
-		$prefix    = 'attachment;filename="';
-		$suffix    = '"';
+		$prefix = 'attachment;filename="';
+		$suffix = '"';
 
 		// Ensure we have a string (wp_remote_retrieve_header can return array)
 		if ( is_array( $file_name ) ) {
@@ -85,7 +85,7 @@ readonly class AlbumItem {
 			$file_name = \sanitize_file_name( $file_name );
 		}
 
-		if ( ! $file_name ) {
+		if ( ! is_string( $file_name ) || '' === $file_name ) {
 			$file_name = \wp_generate_password( 8, false ) . '.jpg';
 		}
 

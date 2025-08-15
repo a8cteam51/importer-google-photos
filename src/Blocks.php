@@ -67,12 +67,18 @@ final class Blocks {
 
 		\wp_enqueue_script( "$plugin_slug-editor" );
 
-		\wp_enqueue_style(
-			"$plugin_slug-mediaupload-hook",
-			\constant( 'GOOGLE_PHOTOS_ALBUM_DIR_URL' ) . 'assets/js/build/style-editor.css',
-			array(),
-			(string) \filemtime( \constant( 'GOOGLE_PHOTOS_ALBUM_DIR_PATH' ) . 'assets/js/build/style-editor.css' )
-		);
+		$style_rel_path = 'assets/js/build/style-editor.css';
+		$style_path     = \constant( 'GOOGLE_PHOTOS_ALBUM_DIR_PATH' ) . $style_rel_path;
+		$style_url      = \constant( 'GOOGLE_PHOTOS_ALBUM_DIR_URL' ) . $style_rel_path;
+
+		if ( \file_exists( $style_path ) ) {
+			\wp_enqueue_style(
+				"$plugin_slug-mediaupload-hook",
+				$style_url,
+				array( 'wp-components' ),
+				(string) \filemtime( $style_path )
+			);
+		}
 	}
 
 	// endregion
