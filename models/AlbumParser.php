@@ -57,16 +57,20 @@ final class AlbumParser {
 			return null;
 		}
 
-		$html = \wp_remote_retrieve_body( $response );
+		$response_code = \wp_remote_retrieve_response_code( $response );
+		if ( $response_code < 200 || $response_code >= 300 ) {
+			return null;
+		}
 
-		if ( is_wp_error( $html ) ) {
+		$html = \wp_remote_retrieve_body( $response );
+		if ( '' === $html ) {
 			return null;
 		}
 
 		// The data we need is in an object that's used to initialize the AF_initDataCallback function.
 		// Because the function expects an object, it's not valid JSON, but the `data` key which contains
 		// each album image and metadata is valid JSON, so we try to extract it.
-		$data_json = preg_match( '/data:(\[null.*,[,0\]]])/mi', $html, $matches );
+		$data_json = preg_match( '/data:(\[null.*,[,0\]]\])/mi', $html, $matches );
 
 		if ( 1 !== $data_json ) {
 			return null;
