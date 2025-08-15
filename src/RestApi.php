@@ -3,9 +3,7 @@
 namespace A8C\SpecialProjects\GooglePhotosAlbum;
 
 use A8C\SpecialProjects\GooglePhotosAlbum\Models\AlbumParser;
-use A8C\SpecialProjects\GooglePhotosAlbum\Contracts\ImportStrategy;
-use A8C\SpecialProjects\GooglePhotosAlbum\Models\AsyncImportStrategy;
-use A8C\SpecialProjects\GooglePhotosAlbum\Models\DirectImportStrategy;
+use A8C\SpecialProjects\GooglePhotosAlbum\Models\ImageImporter;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -61,7 +59,7 @@ final class RestApi {
 				'callback'            => array( $this, 'import_album' ),
 				'permission_callback' => fn () => \current_user_can( 'edit_posts' ) && \current_user_can( 'upload_files' ),
 				'args'                => array(
-					'url'       => array(
+					'image_url' => array(
 						'required'          => true,
 						'type'              => 'string',
 						'validate_callback' => fn ( $value ) => \is_string( $value ) && \str_starts_with( $value, 'https://lh3.googleusercontent.com/pw/' ),
@@ -75,7 +73,7 @@ final class RestApi {
 						'default'           => 0,
 					),
 					'album_url' => array(
-						'required'          => false,
+						'required'          => true,
 						'type'              => 'string',
 						'validate_callback' => fn ( $value ) => \is_string( $value ) && \str_starts_with( $value, 'https://photos.app.goo.gl/' ),
 						'sanitize_callback' => 'esc_url_raw',
@@ -117,7 +115,7 @@ final class RestApi {
 	public function verify_album( \WP_REST_Request $request ): \WP_REST_Response {
 		$url    = $request->get_param( 'url' );
 		$parser = new AlbumParser( $url );
-		$images = $parser->get_images();
+		$images = $parser->get_album()?->get_images() ?? array();
 
 		$imported = \get_option( $this->get_option_key( $url ), array() );
 
@@ -132,7 +130,7 @@ final class RestApi {
 	}
 
 	/**
-	 * Imports an album.
+	 * Imports an album image.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -143,12 +141,26 @@ final class RestApi {
 	 * @return  \WP_REST_Response
 	 */
 	public function import_album( \WP_REST_Request $request ): \WP_REST_Response {
-		$url       = $request->get_param( 'url' );
+		$image_url = $request->get_param( 'image_url' );
 		$post_id   = (int) $request->get_param( 'post_id' );
 		$album_url = $request->get_param( 'album_url' );
+		$existing  = \get_option( $this->get_option_key( $album_url ), array() );
 
-		$strategy = $this->get_import_strategy();
-		$result   = $strategy->import( $url, $post_id );
+		if ( in_array( $image_url, array_column( $existing, 'original_url' ), true ) ) {
+			$item = $existing[ array_search( $image_url, array_column( $existing, 'original_url' ), true ) ];
+
+			return new \WP_REST_Response(
+				array(
+					'success'       => true,
+					'attachment_id' => $item['id'],
+					'url'           => $item['url'],
+					'id'            => $item['id'],
+					'original_url'  => $item['original_url'],
+				)
+			);
+		}
+
+		$result = ImageImporter::import_single_image( $image_url, $post_id );
 
 		if ( \is_wp_error( $result ) ) {
 			return new \WP_REST_Response(
@@ -160,32 +172,22 @@ final class RestApi {
 			);
 		}
 
-		if ( true === $result ) {
-			return new \WP_REST_Response(
-				array(
-					'success' => true,
-					'queued'  => true,
-				)
-			);
-		}
-
 		$data = array(
 			'id'           => $result,
 			'url'          => wp_get_attachment_url( $result ),
-			'original_url' => $url, // Store the original Google Photos URL
+			'original_url' => $image_url,
 		);
 
 		if ( ! is_null( $album_url ) ) {
 			$option_key = $this->get_option_key( $album_url );
-			$existing   = (array) get_option( $option_key, array() );
+			$existing   = \get_option( $option_key, array() );
 			$existing[] = $data;
-			update_option( $option_key, $existing );
+			\update_option( $option_key, $existing );
 		}
 
 		return new \WP_REST_Response(
 			array(
 				'success'       => true,
-				'queued'        => false,
 				'attachment_id' => $result,
 				'url'           => $data['url'],
 				'id'            => $data['id'],
@@ -206,24 +208,6 @@ final class RestApi {
 	 */
 	private function get_option_key( string $album_url ): string {
 		return 'gpa_imported_' . md5( $album_url );
-	}
-
-	/**
-	 * Get the import strategy.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  ImportStrategy
-	 */
-	private function get_import_strategy(): ImportStrategy {
-		$use_async = \apply_filters( 'google_photos_album_use_async_import', false );
-
-		if ( $use_async && class_exists( 'ActionScheduler' ) ) {
-			return new AsyncImportStrategy();
-		}
-
-		return new DirectImportStrategy();
 	}
 
 	// endregion

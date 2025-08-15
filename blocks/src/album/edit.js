@@ -152,10 +152,15 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 	 * Handles the completion of the import process.
 	 * Determines the appropriate action based on success/failure rates.
 	 *
-	 * @param {number} importedCount - Number of successfully imported images.
-	 * @param {number} failedCount   - Number of images that failed to import.
+	 * @param {number} importedCount     - Number of successfully imported images.
+	 * @param {number} failedCount       - Number of images that failed to import.
+	 * @param {Array}  importedImagesArg - Array of imported images.
 	 */
-	const handleImportCompletion = ( importedCount, failedCount ) => {
+	const handleImportCompletion = (
+		importedCount,
+		failedCount,
+		importedImagesArg
+	) => {
 		setDone( true );
 		setIsImporting( false );
 
@@ -165,7 +170,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 			resetToInitialState();
 		} else {
 			// Some or all imports succeeded
-			insertGalleryBlock( imported );
+			insertGalleryBlock( importedImagesArg || imported );
 
 			// Mark import as completed
 			setAttributes( { importCompleted: true } );
@@ -328,15 +333,23 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 
 		// Find the next image that hasn't been imported yet or failed
 		// Compare using original_url field from imported items and failed imports
-		const nextImage = allImages.find(
-			( img ) =>
+		const processedCount = imported.length + failedImports.length;
+		let nextImage = allImages.find( ( img ) => {
+			const candidateUrl = img?.download_url || img?.url || img;
+			return (
 				! imported.some(
-					( importedItem ) => importedItem.original_url === img
+					( importedItem ) =>
+						importedItem.original_url === candidateUrl
 				) &&
 				! failedImports.some(
-					( failedItem ) => failedItem.original_url === img
+					( failedItem ) => failedItem.original_url === candidateUrl
 				)
-		);
+			);
+		} );
+
+		if ( ! nextImage && processedCount < allImages.length ) {
+			nextImage = allImages[ processedCount ];
+		}
 
 		if ( ! nextImage ) {
 			// All images have been processed (either imported or failed)
@@ -349,17 +362,17 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 				path: '/google-photos-album/v1/album/import',
 				method: 'POST',
 				data: {
-					url: nextImage,
+					image_url: nextImage.download_url,
 					post_id: postId,
 					album_url: albumUrl,
 				},
 			} )
 				.then( ( result ) => {
-					if ( result.success && ! result.queued ) {
+					if ( result.success ) {
 						const newImportedItem = {
 							id: result.id,
 							url: result.url,
-							original_url: result.original_url || nextImage,
+							original_url: result.original_url,
 						};
 						const updated = [ ...imported, newImportedItem ];
 						setAttributes( { imported: updated } );
@@ -370,17 +383,15 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 						) {
 							handleImportCompletion(
 								updated.length,
-								failedImports.length
+								failedImports.length,
+								updated
 							);
 						}
-					} else if ( result.queued ) {
-						// Handle async import - for now, just continue
-						console.log( 'Image queued for async import' ); // eslint-disable-line no-console -- Enabling during MVP
 					}
 				} )
 				.catch( ( err ) => {
 					const failedItem = {
-						original_url: nextImage,
+						original_url: nextImage.download_url,
 						error:
 							err.message ||
 							__( 'Unknown error', 'google-photos-album' ),

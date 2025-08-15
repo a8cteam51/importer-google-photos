@@ -23,14 +23,14 @@ final class AlbumParser {
 	private string $url;
 
 	/**
-	 * The images in the album.
+	 * The parsed Album.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 *
-	 * @var string[]
+	 * @var Album|null
 	 */
-	private array $images;
+	private ?Album $album;
 
 	/**
 	 * The URL of the Google Photos album.
@@ -41,50 +41,70 @@ final class AlbumParser {
 	 * @param   string $url The URL of the Google Photos album.
 	 */
 	public function __construct( string $url ) {
-		$this->url    = \esc_url_raw( $url );
-		$this->images = $this->extract_images();
+		$this->url   = \esc_url_raw( $url );
+		$this->album = $this->parse_album();
 	}
 
 	/**
-	 * Parses the album and returns the images.
+	 * Enhanced extractor that returns album metadata and photo items with details.
 	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return string[]
+	 * @return Album|null
 	 */
-	private function extract_images(): array {
+	public function parse_album(): ?Album {
 		$response = \wp_safe_remote_get( $this->url );
 
-		if ( \is_wp_error( $response ) ) {
-			return array();
+		if ( \is_wp_error( $response ) || 200 !== \wp_remote_retrieve_response_code( $response ) ) {
+			return null;
 		}
 
-		$urls = \wp_extract_urls( \wp_remote_retrieve_body( $response ) );
-
-		// Very naive assumption that all images are in the album are in the Google Photos URL format.
-		$filtered = array_filter(
-			$urls,
-			static fn ( string $url ) => str_starts_with( $url, 'https://lh3.googleusercontent.com/pw/' ) && str_ends_with( $url, '-no' )
-		);
-
-		// Remove the "query params" after `=` from the URL, return empty string if no `=` is found.
-		$normalized = array_map(
-			static function ( string $url ): string {
-				$result = strstr( $url, '=', true );
-				return false !== $result ? $result : '';
-			},
-			$filtered
-		);
-
-		if ( count( $normalized ) === 0 ) {
-			return array();
+		// The data we need is in an object that's used to initialize the AF_initDataCallback function.
+		// Because the function expects an object, it's not valid JSON, but the `data` key which contains
+		// each album image and metadata is valid JSON, so we try to extract it.
+		if ( 1 !== preg_match( '/data:(\[null.*,[,0\]]\])/mi', \wp_remote_retrieve_body( $response ), $matches ) ) {
+			return null;
 		}
 
-		return array_values( array_unique( $normalized ) );
+		$data = json_decode( $matches[1], true );
+
+		if ( is_null( $data ) ) {
+			return null;
+		}
+
+		$entries = is_array( $data[1] ?? null ) ? $data[1] : array();
+
+		$album = array(
+			'id'    => $data[3][0] ?? '',
+			'title' => $data[3][1] ?? '',
+		);
+
+		$items = array();
+
+		foreach ( $entries as $entry ) {
+			if ( ! is_array( $entry ) ) {
+				continue;
+			}
+
+			$media = $entry[1] ?? null;
+			if ( ! is_array( $media ) ) {
+				continue;
+			}
+
+			$items[] = new AlbumItem(
+				$media[0] ?? '',
+				$media[1] ?? 0,
+				$media[2] ?? 0,
+				$media[9][0] ?? null,
+				$entry[2] ?? null,
+				$entry[4] ?? null
+			);
+		}
+
+		return new Album(
+			$album['id'],
+			$album['title'],
+			$items
+		);
 	}
-
-
 
 	/**
 	 * Get the images in the album.
@@ -92,9 +112,9 @@ final class AlbumParser {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 *
-	 * @return string[]
+	 * @return Album|null
 	 */
-	public function get_images(): array {
-		return $this->images;
+	public function get_album(): ?Album {
+		return $this->album;
 	}
 }
