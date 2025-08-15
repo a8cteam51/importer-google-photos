@@ -73,7 +73,7 @@ final class RestApi {
 						'default'           => 0,
 					),
 					'album_url' => array(
-						'required'          => false,
+						'required'          => true,
 						'type'              => 'string',
 						'validate_callback' => fn ( $value ) => \is_string( $value ) && \str_starts_with( $value, 'https://photos.app.goo.gl/' ),
 						'sanitize_callback' => 'esc_url_raw',
