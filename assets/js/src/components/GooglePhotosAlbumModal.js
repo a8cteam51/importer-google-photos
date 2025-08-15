@@ -115,6 +115,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 								'google-photos-album'
 							) }
 							render={ <ul /> }
+							aria-multiselectable={ true }
 						>
 							{ images.map( ( img ) => {
 								const previewUrl =
@@ -125,7 +126,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 									<Composite.Item
 										key={ key }
 										className="gpa-modal__item"
-										aria-checked={ checked }
+										aria-selected={ checked }
 										aria-label={ __(
 											'Select image',
 											'google-photos-album'
