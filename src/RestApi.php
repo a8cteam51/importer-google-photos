@@ -115,7 +115,7 @@ final class RestApi {
 	public function verify_album( \WP_REST_Request $request ): \WP_REST_Response {
 		$url    = $request->get_param( 'url' );
 		$parser = new AlbumParser( $url );
-		$images = $parser->album?->get_images() ?? array();
+		$images = $parser->get_album()?->get_images() ?? array();
 
 		$imported = \get_option( $this->get_option_key( $url ), array() );
 

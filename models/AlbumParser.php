@@ -30,7 +30,7 @@ final class AlbumParser {
 	 *
 	 * @var Album|null
 	 */
-	public ?Album $album;
+	private ?Album $album;
 
 	/**
 	 * The URL of the Google Photos album.

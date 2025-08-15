@@ -35,8 +35,8 @@ readonly class AlbumItem {
 	 */
 	public function __construct(
 		public string $url,
-		public ?int $width = null,
-		public ?int $height = null,
+		public int $width = 0,
+		public int $height = 0,
 		public ?int $filesize = null,
 		public ?int $created_at_ms = null,
 		public ?int $timezone_offset_ms = null,
@@ -53,7 +53,7 @@ readonly class AlbumItem {
 	 * @return string
 	 */
 	private function get_download_url(): string {
-		return sprintf( '%s=w%d-h%d-d-no', $this->url, $this->width ?? 0, $this->height ?? 0 );
+		return sprintf( '%s=w%d-h%d-d-no', $this->url, $this->width, $this->height );
 	}
 
 	/**
