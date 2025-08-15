@@ -82,23 +82,45 @@ final class AlbumParser {
 			return null;
 		}
 
-		$entries = $data[1] ?? array();
+		$entries = is_array( $data[1] ?? null ) ? $data[1] : array();
+		$album   = array(
+			'id'    => (string) $data[3][0] ?? '',
+			'title' => (string) $data[3][1] ?? '',
+		);
+
+		if ( '' === $album['id'] || '' === $album['title'] ) {
+			return null;
+		}
+
 		$album   = array(
 			'id'    => $data[3][0] ?? null,
 			'title' => $data[3][1] ?? null,
 		);
 
 		$items = array();
+
 		foreach ( $entries as $entry ) {
-			$media   = $entry[1];
+			if ( ! is_array( $entry ) ) {
+				continue;
+			}
+
+			$media = $entry[1] ?? null;
+			if ( ! is_array( $media ) ) {
+				continue;
+			}
+
 			$items[] = new AlbumItem(
-				$media[0] ?? '',
-				$media[1] ?? 0,
-				$media[2] ?? 0,
-				$media[9][0] ?? null,
-				$entry[2] ?? null,
-				$entry[4] ?? null
+				(string) $media[0] ?? '',
+				isset( $media[1] ) ? (int) $media[1] : 0,
+				isset( $media[2] ) ? (int) $media[2] : 0,
+				isset( $media[9][0] ) ? (int) $media[9][0] : null,
+				isset( $entry[2] ) ? (int) $entry[2] : null,
+				isset( $entry[4] ) ? (int) $entry[4] : null
 			);
+		}
+
+		if ( empty( $items ) ) {
+			return null;
 		}
 
 		return new Album(
