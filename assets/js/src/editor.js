@@ -31,10 +31,13 @@ function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
 						album_url: albumUrl,
 					},
 				} );
-				if ( result?.success && ! result?.queued ) {
+				if ( result?.success ) {
 					imported.push( { id: result.id, url: result.url } );
 				}
-			} catch ( e ) {}
+			} catch ( e ) {
+				// eslint-disable-next-line no-console
+				console.error( 'Import failed for', url, e );
+			}
 		}
 		if ( imported.length ) {
 			const mediaItems = imported.map( ( img ) => ( {
@@ -54,8 +57,9 @@ function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
 					shouldPassArray ? mediaItems : mediaItems[ 0 ]
 				);
 			}
+
+			setIsOpen( false );
 		}
-		setIsOpen( false );
 	};
 
 	const original = originalRender ? originalRender( button ) : null;

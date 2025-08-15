@@ -52,17 +52,21 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 			.finally( () => setLoading( false ) );
 	};
 
-	const insert = () => {
+	const insert = async () => {
 		const urls = images
 			.filter( ( img ) => img && img.url && selected[ img.url ] )
-			.map( ( img ) => img.url );
+			.map( ( img ) => img.download_url );
 
 		if ( ! urls.length ) {
 			return;
 		}
 
 		setImporting( true );
-		onInsert( { albumUrl, urls } );
+		try {
+			await onInsert( { albumUrl, urls } );
+		} finally {
+			setImporting( false );
+		}
 	};
 
 	if ( ! isOpen ) {
@@ -118,13 +122,12 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 							aria-multiselectable={ true }
 						>
 							{ images.map( ( img ) => {
-								const previewUrl =
-									img?.url || img?.download_url;
-								const key = img?.url || previewUrl;
-								const checked = !! selected[ key ];
+								const previewUrl = img?.url;
+								const checked = !! selected[ previewUrl ];
+
 								return (
 									<Composite.Item
-										key={ key }
+										key={ previewUrl }
 										className="gpa-modal__item"
 										aria-selected={ checked }
 										aria-label={ __(
@@ -132,7 +135,9 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 											'google-photos-album'
 										) }
 										render={ <li role="option" /> }
-										onClick={ () => toggleSelect( key ) }
+										onClick={ () =>
+											toggleSelect( previewUrl )
+										}
 									>
 										<button
 											type="button"

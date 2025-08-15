@@ -66,7 +66,7 @@ readonly class AlbumItem {
 	 */
 	public function get_filename(): string {
 		$file_name = '';
-		$response  = \wp_safe_remote_head( $this->download_url );
+		$response  = \wp_safe_remote_head( $this->url );
 
 		if ( ! \is_wp_error( $response ) ) {
 			$file_name = \wp_remote_retrieve_header( $response, 'content-disposition' );

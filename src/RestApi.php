@@ -130,7 +130,7 @@ final class RestApi {
 	}
 
 	/**
-	 * Imports an album.
+	 * Imports an album image.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -144,6 +144,21 @@ final class RestApi {
 		$image_url = $request->get_param( 'image_url' );
 		$post_id   = (int) $request->get_param( 'post_id' );
 		$album_url = $request->get_param( 'album_url' );
+		$existing  = \get_option( $this->get_option_key( $album_url ), array() );
+
+		if ( in_array( $image_url, array_column( $existing, 'original_url' ), true ) ) {
+			$item = $existing[ array_search( $image_url, array_column( $existing, 'original_url' ), true ) ];
+
+			return new \WP_REST_Response(
+				array(
+					'success'       => true,
+					'attachment_id' => $item['id'],
+					'url'           => $item['url'],
+					'id'            => $item['id'],
+					'original_url'  => $item['original_url'],
+				)
+			);
+		}
 
 		$result = ImageImporter::import_single_image( $image_url, $post_id );
 
