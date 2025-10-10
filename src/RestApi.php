@@ -62,7 +62,7 @@ final class RestApi {
 					'image_url' => array(
 						'required'          => true,
 						'type'              => 'string',
-						'validate_callback' => fn ( $value ) => \is_string( $value ) && \str_starts_with( $value, 'https://lh3.googleusercontent.com/pw/' ),
+						'validate_callback' => fn ( $value ) => \str_starts_with( $value, 'https://lh3.googleusercontent.com/pw/' ),
 						'sanitize_callback' => 'esc_url_raw',
 					),
 					'post_id'   => array(
@@ -72,11 +72,11 @@ final class RestApi {
 						'sanitize_callback' => 'absint',
 						'default'           => 0,
 					),
-					'album_url' => array(
+					'album_id' => array(
 						'required'          => true,
 						'type'              => 'string',
-						'validate_callback' => fn ( $value ) => \is_string( $value ) && \str_starts_with( $value, 'https://photos.app.goo.gl/' ),
-						'sanitize_callback' => 'esc_url_raw',
+						'validate_callback' => array( $this, 'validate_album_id' ),
+						'sanitize_callback' => 'sanitize_text_field',
 					),
 				),
 			)
@@ -93,7 +93,7 @@ final class RestApi {
 					'url' => array(
 						'required'          => true,
 						'type'              => 'string',
-						'validate_callback' => fn ( $value ) => \is_string( $value ) && \str_starts_with( $value, 'https://photos.app.goo.gl/' ),
+						'validate_callback' => array( $this, 'validate_album_url' ),
 						'sanitize_callback' => 'esc_url_raw',
 					),
 				),
@@ -113,11 +113,10 @@ final class RestApi {
 	 * @return  \WP_REST_Response Array with image URLs if valid, otherwise an error.
 	 */
 	public function verify_album( \WP_REST_Request $request ): \WP_REST_Response {
-		$url    = $request->get_param( 'url' );
-		$parser = new AlbumParser( $url );
-		$images = $parser->get_album()?->get_images() ?? array();
-
-		$imported = \get_option( $this->get_option_key( $url ), array() );
+		$url      = $request->get_param( 'url' );
+		$parser   = new AlbumParser( $url );
+		$images   = $parser->get_album()?->get_images() ?? array();
+		$imported = \get_option( $this->get_option_key( $parser->get_album_id() ), array() );
 
 		return new \WP_REST_Response(
 			array(
@@ -125,6 +124,7 @@ final class RestApi {
 				'images'   => $images,
 				'count'    => count( $images ),
 				'imported' => $imported,
+				'album_id' => $parser->get_album_id(),
 			)
 		);
 	}
@@ -143,20 +143,13 @@ final class RestApi {
 	public function import_album( \WP_REST_Request $request ): \WP_REST_Response {
 		$image_url = $request->get_param( 'image_url' );
 		$post_id   = (int) $request->get_param( 'post_id' );
-		$album_url = $request->get_param( 'album_url' );
-		$existing  = \get_option( $this->get_option_key( $album_url ), array() );
+		$album_id  = $request->get_param( 'album_id' );
+		$existing  = \get_option( $this->get_option_key( $album_id ), array() );
+		$key       = array_search( $image_url, array_column( $existing, 'album_img_url' ), true );
 
-		if ( in_array( $image_url, array_column( $existing, 'original_url' ), true ) ) {
-			$item = $existing[ array_search( $image_url, array_column( $existing, 'original_url' ), true ) ];
-
+		if ( false !== $key ) {
 			return new \WP_REST_Response(
-				array(
-					'success'       => true,
-					'attachment_id' => $item['id'],
-					'url'           => $item['url'],
-					'id'            => $item['id'],
-					'original_url'  => $item['original_url'],
-				)
+				array_merge( $existing[ $key ], array( 'success' => true ) )
 			);
 		}
 
@@ -173,27 +166,48 @@ final class RestApi {
 		}
 
 		$data = array(
-			'id'           => $result,
-			'url'          => wp_get_attachment_url( $result ),
-			'original_url' => $image_url,
+			'attachment_id'  => $result,
+			'attachment_url' => wp_get_attachment_url( $result ),
+			'album_img_url'  => $image_url,
 		);
 
-		if ( ! is_null( $album_url ) ) {
-			$option_key = $this->get_option_key( $album_url );
-			$existing   = \get_option( $option_key, array() );
-			$existing[] = $data;
-			\update_option( $option_key, $existing );
-		}
+		$option_key = $this->get_option_key( $album_id );
+		$existing   = \get_option( $option_key, array() );
+		$existing[] = $data;
+		\update_option( $option_key, $existing );
 
 		return new \WP_REST_Response(
-			array(
-				'success'       => true,
-				'attachment_id' => $result,
-				'url'           => $data['url'],
-				'id'            => $data['id'],
-				'original_url'  => $data['original_url'],
-			)
+			array_merge( $data, array( 'success' => true ) )
 		);
+	}
+
+
+	/**
+	 * Validate the album URL.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @param   string $value The value to validate.
+	 *
+	 * @return  bool
+	 */
+	public function validate_album_url( string $value ): bool {
+		return \str_starts_with( $value, 'https://photos.app.goo.gl/' ) || \str_starts_with( $value, 'https://photos.google.com/share/' );
+	}
+
+	/**
+	 * Validate the album ID.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @param   string $value The value to validate.
+	 *
+	 * @return  bool
+	 */
+	public function validate_album_id( string $value ): bool {
+		return (bool) \preg_match( '/\bAF1Qip[A-Za-z0-9_-]{20,}\b/', $value );
 	}
 
 	/**
@@ -202,12 +216,12 @@ final class RestApi {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 *
-	 * @param   string $album_url The album URL.
+	 * @param   string $album_id The album ID.
 	 *
 	 * @return  string
 	 */
-	private function get_option_key( string $album_url ): string {
-		return 'gpa_imported_' . md5( $album_url );
+	private function get_option_key( string $album_id ): string {
+		return 'gpa_imported_' . $album_id;
 	}
 
 	// endregion

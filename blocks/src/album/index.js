@@ -39,9 +39,12 @@ registerBlockType( metadata.name, {
 				// Match Google Photos album URLs when pasted
 				isMatch: ( node ) =>
 					node.nodeName === 'P' &&
-					/^\s*(https?:\/\/photos\.app\.goo\.gl\/[a-z0-9]+)\s*$/i.test(
+					( /^\s*(https:\/\/photos\.app\.goo\.gl\/[a-z0-9]+)\s*$/i.test(
 						node.textContent
-					),
+					) ||
+						/^\s*(https:\/\/photos\.google\.com\/share\/[A-Za-z0-9_-]+\?key=[A-Za-z0-9_-]+)\s*$/i.test(
+							node.textContent
+						) ),
 				transform: ( node ) => {
 					return createBlock( metadata.name, {
 						albumUrl: node.textContent.trim(),

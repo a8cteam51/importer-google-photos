@@ -12,25 +12,38 @@
 			"type": "string",
 			"default": ""
 		},
-		"imported": {
+		"importedImages": {
 			"type": "array",
 			"default": [],
 			"items": {
 				"type": "object",
 				"properties": {
-					"id": { "type": "integer" },
-					"url": { "type": "string" }
+					"attachment_id": { "type": "integer" },
+					"attachment_url": { "type": "string" },
+					"album_img_url": { "type": "string" }
 				}
 			}
 		},
 		"allImages": {
 			"type": "array",
 			"default": [],
-			"items": { "type": "string" }
+			"items": { "type": "object" },
+			"properties": {
+				"download_url": { "type": "integer" },
+				"url": { "type": "string" },
+				"width": { "type": "integer" },
+				"height": { "type": "integer" },
+				"filesize": { "type": "integer" },
+				"created_at_ms": { "type": "integer" }
+			}
 		},
 		"importCompleted": {
 			"type": "boolean",
 			"default": false
+		},
+		"albumId": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {

@@ -23,6 +23,16 @@ final class AlbumParser {
 	private string $url;
 
 	/**
+	 * The ID of the Google Photos album.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @var string
+	 */
+	private ?string $id = null;
+
+	/**
 	 * The parsed Album.
 	 *
 	 * @since   1.0.0
@@ -53,8 +63,14 @@ final class AlbumParser {
 	public function parse_album(): ?Album {
 		$response = \wp_safe_remote_get( $this->url );
 
-		if ( \is_wp_error( $response ) || 200 !== \wp_remote_retrieve_response_code( $response ) ) {
+		if ( \is_wp_error( $response ) || \WP_Http::OK !== \wp_remote_retrieve_response_code( $response ) ) {
 			return null;
+		}
+
+		if ( \str_starts_with( $this->url, 'https://photos.google.com/share/' ) ) {
+			$this->id = \strstr( $this->url, '?key', true );
+		} else {
+			$this->id = \strstr( $response['http_response']->get_response_object()->url, '?key', true );
 		}
 
 		// The data we need is in an object that's used to initialize the AF_initDataCallback function.
@@ -116,5 +132,17 @@ final class AlbumParser {
 	 */
 	public function get_album(): ?Album {
 		return $this->album;
+	}
+
+	/**
+	 * Get the ID of the Google Photos album.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return string|null
+	 */
+	public function get_album_id(): ?string {
+		return $this->id;
 	}
 }

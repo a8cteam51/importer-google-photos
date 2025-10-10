@@ -31,405 +31,220 @@ import AlbumInspectorControls from './inspector-controls';
 import './editor.scss';
 
 export default function Edit( { clientId, attributes, setAttributes } ) {
-	const [ error, setError ] = useState( '' );
-	const [ loading, setLoading ] = useState( false );
-	const [ done, setDone ] = useState( false );
-	const [ isImporting, setIsImporting ] = useState( false );
-	const [ failedImports, setFailedImports ] = useState( [] );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const { createNotice } = useDispatch( noticesStore );
 
-	const { albumUrl, allImages, imported, importCompleted } = attributes;
-	const postId = useSelect(
+	const blockProps = useBlockProps();
+	const { albumUrl, importedImages, allImages, importCompleted, albumId } =
+		attributes;
+
+	const [ error, setError ] = useState( null );
+	const [ loading, setLoading ] = useState( false );
+	const [ importing, setImporting ] = useState( false );
+	const [ importProgress, setImportProgress ] = useState( 0 );
+
+	const currentPostId = useSelect(
 		( select ) => select( 'core/editor' ).getCurrentPostId(),
 		[]
 	);
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-	const { createErrorNotice } = useDispatch( noticesStore );
-	const blockProps = useBlockProps();
-
-	const progress =
-		allImages.length > 0
-			? Math.round(
-					( ( imported.length + failedImports.length ) /
-						allImages.length ) *
-						100
-			  )
-			: 0;
 
 	/**
-	 * Creates and inserts a gallery block with the imported images.
-	 *
-	 * @param {Array}  importedImages       - Array of successfully imported image objects.
-	 * @param {number} importedImages[].id  - WordPress media ID.
-	 * @param {string} importedImages[].url - Image URL.
+	 * Import a single image from the album
+	 * @param {string} imageUrl - The Google Photos image URL
+	 * @param {string} albumId - The album ID
+	 * @return {Promise} Promise that resolves to the import result
 	 */
-	const insertGalleryBlock = ( importedImages ) => {
+	const importSingleImage = async ( imageUrl, albumId ) => {
+		return apiFetch( {
+			path: '/google-photos-album/v1/album/import',
+			method: 'POST',
+			data: {
+				image_url: imageUrl,
+				post_id: currentPostId,
+				album_id: albumId,
+			},
+		} );
+	};
+
+	/**
+	 * Import all images that haven't been imported yet
+	 * @param {Array} allImages - All images from the album
+	 * @param {Array} importedImages - Already imported images
+	 * @param {string} albumId - The album ID
+	 */
+	const importImages = async ( allImages, importedImages, albumId ) => {
+		const importedUrls = new Set(
+			importedImages.map( ( img ) => img.download_url )
+		);
+		const imagesToImport = allImages.filter(
+			( img ) => ! importedUrls.has( img.download_url )
+		);
+
+		if ( imagesToImport.length === 0 ) {
+			setAttributes( { importCompleted: true } );
+			createGalleryBlock( importedImages );
+			return;
+		}
+
+		setImporting( true );
+		setImportProgress( 0 );
+
+		const newImportedImages = [ ...importedImages ];
+		const totalImages = imagesToImport.length;
+
+		try {
+			for ( let i = 0; i < imagesToImport.length; i++ ) {
+				const image = imagesToImport[ i ];
+
+				try {
+					const result = await importSingleImage(
+						image.download_url,
+						albumId
+					);
+
+					if ( result.success ) {
+						newImportedImages.push( {
+							attachment_id: result.attachment_id,
+							attachment_url: result.attachment_url,
+							album_img_url: result.album_img_url,
+						} );
+
+						setAttributes( { importedImages: newImportedImages } );
+						setImportProgress( ( ( i + 1 ) / totalImages ) * 100 );
+					}
+				} catch ( imageError ) {
+					console.error(
+						`Failed to import image ${ image.url }:`,
+						imageError
+					);
+					// Continue with the next image even if one fails
+				}
+			}
+
+			// Import completed
+			setAttributes( { importCompleted: true } );
+			createGalleryBlock( newImportedImages );
+
+			createNotice(
+				'success',
+				sprintf(
+					_n(
+						'Successfully imported %d image from Google Photos album.',
+						'Successfully imported %d images from Google Photos album.',
+						newImportedImages.length,
+						'google-photos-album'
+					),
+					newImportedImages.length
+				),
+				{
+					type: 'snackbar',
+					isDismissible: true,
+				}
+			);
+		} catch ( error ) {
+			setError( error.message );
+
+			createNotice(
+				'error',
+				__(
+					'Failed to import images from Google Photos album.',
+					'google-photos-album'
+				),
+				{
+					type: 'snackbar',
+					isDismissible: true,
+				}
+			);
+		} finally {
+			setImporting( false );
+			setImportProgress( 0 );
+		}
+	};
+
+	const verifyAlbum = () => {
+		setLoading( true );
+		setError( null );
+
+		apiFetch( {
+			path: addQueryArgs( '/google-photos-album/v1/album/verify', {
+				url: albumUrl,
+			} ),
+		} )
+			.then( ( response ) => {
+				console.log( response );
+
+				if ( response.valid ) {
+					setAttributes( {
+						allImages: response.images,
+						importedImages: response.imported,
+						albumId: response.album_id,
+					} );
+
+					// Check if all images are already imported
+					if ( response.imported.length === response.images.length ) {
+						setAttributes( { importCompleted: true } );
+						createGalleryBlock( response.imported );
+					} else {
+						// Start importing the remaining images
+						importImages(
+							response.images,
+							response.imported,
+							response.album_id
+						);
+					}
+				} else {
+					setError(
+						__(
+							'Invalid album URL or the album is not publicly accessible.',
+							'google-photos-album'
+						)
+					);
+				}
+			} )
+			.catch( ( error ) => {
+				setError( error.message );
+			} )
+			.finally( () => {
+				setLoading( false );
+			} );
+	};
+
+	/**
+	 * Create a gallery block with the imported images
+	 * @param {Array} importedImages - The imported images
+	 */
+	const createGalleryBlock = ( images ) => {
 		const galleryBlock = createBlock(
 			'core/gallery',
 			{
-				ids: importedImages.map( ( img ) => img.id ),
-				images: importedImages.map( ( img ) => ( {
-					id: img.id,
-					url: img.url,
-				} ) ),
+				ids: images.map( ( img ) => img.attachment_id ),
 			},
-			importedImages.map( ( img ) =>
+			images.map( ( img ) =>
 				createBlock( 'core/image', {
-					id: img.id,
-					url: img.url,
-					alt: '',
+					id: img.attachment_id,
+					url: img.attachment_url,
 				} )
 			)
 		);
-		replaceInnerBlocks( clientId, [ galleryBlock ] );
-	};
 
-	/**
-	 * Resets the block to its initial state.
-	 * Used when all images fail to import, allowing users to try again.
-	 */
-	const resetToInitialState = () => {
-		setAttributes( {
-			allImages: [],
-			imported: [],
-			importCompleted: false,
-		} );
-		setFailedImports( [] );
-		setDone( false );
-	};
-
-	/**
-	 * Clears temporary import state after successful completion.
-	 * Keeps the imported images but removes the import progress tracking.
-	 */
-	const clearTemporaryImportState = () => {
-		setAttributes( { allImages: [] } );
-		setFailedImports( [] );
-	};
-
-	/**
-	 * Shows a snackbar notice when all images fail to import.
-	 * Provides guidance to the user about trying a different album.
-	 */
-	const showAllImportsFailedNotice = () => {
-		createErrorNotice(
-			__(
-				'All images failed to import. Please try a different album or check the album URL.',
-				'google-photos-album'
-			),
-			{
-				type: 'snackbar',
-				isDismissible: true,
-			}
-		);
-	};
-
-	/**
-	 * Shows a snackbar notice for partial import completion.
-	 * Informs the user about both successful and failed imports.
-	 *
-	 * @param {number} successCount - Number of successfully imported images.
-	 * @param {number} failedCount  - Number of images that failed to import.
-	 */
-	const showPartialImportNotice = ( successCount, failedCount ) => {
-		createErrorNotice(
-			sprintf(
-				/* translators: 1: number of successful imports, 2: number of failed imports */
-				__(
-					'Import completed. %1$d images imported successfully, %2$d images failed to import.',
-					'google-photos-album'
-				),
-				successCount,
-				failedCount
-			),
-			{
-				type: 'snackbar',
-				isDismissible: true,
-			}
-		);
-	};
-
-	/**
-	 * Handles the completion of the import process.
-	 * Determines the appropriate action based on success/failure rates.
-	 *
-	 * @param {number} importedCount     - Number of successfully imported images.
-	 * @param {number} failedCount       - Number of images that failed to import.
-	 * @param {Array}  importedImagesArg - Array of imported images.
-	 */
-	const handleImportCompletion = (
-		importedCount,
-		failedCount,
-		importedImagesArg
-	) => {
-		setDone( true );
-		setIsImporting( false );
-
-		if ( importedCount === 0 ) {
-			// All imports failed
-			showAllImportsFailedNotice();
-			resetToInitialState();
-		} else {
-			// Some or all imports succeeded
-			insertGalleryBlock( importedImagesArg || imported );
-
-			// Mark import as completed
-			setAttributes( { importCompleted: true } );
-
-			if ( failedCount > 0 ) {
-				showPartialImportNotice( importedCount, failedCount );
-			}
-
-			clearTemporaryImportState();
-		}
-	};
-
-	/**
-	 * Handles the failure of a single image import.
-	 * Updates the failed imports list and checks if all processing is complete.
-	 *
-	 * @param {string} imageUrl             - The URL of the image that failed to import.
-	 * @param {Error}  importError          - The error object from the failed import.
-	 * @param {Array}  updatedFailedImports - Updated array of failed import objects.
-	 */
-	const handleSingleImageFailure = (
-		imageUrl,
-		importError,
-		updatedFailedImports
-	) => {
-		console.error( 'Import failed for image:', imageUrl, importError ); // eslint-disable-line no-console -- Enabling during MVP
-		setFailedImports( updatedFailedImports );
-
-		// Check if we're done processing all images
-		if (
-			imported.length + updatedFailedImports.length ===
-			allImages.length
-		) {
-			handleImportCompletion(
-				imported.length,
-				updatedFailedImports.length
-			);
-		}
-	};
-
-	/**
-	 * Verifies the album URL and initiates the import process.
-	 * Validates the album and starts importing images if valid.
-	 */
-	const verifyAlbum = () => {
-		setError( '' );
-		setLoading( true );
-
-		apiFetch( {
-			path: addQueryArgs( '/google-photos-album/v1/album/verify', {
-				url: albumUrl,
-			} ),
-		} )
-			.then( ( response ) => {
-				if ( response.valid && response.images.length > 0 ) {
-					setAttributes( {
-						albumUrl,
-						allImages: response.images,
-						imported: response.imported || [],
-					} );
-					if (
-						( response.imported || [] ).length ===
-						response.images.length
-					) {
-						setDone( true );
-						insertGalleryBlock( response.imported );
-						setAttributes( { importCompleted: true } );
-					} else {
-						// Start importing immediately after verify
-						setIsImporting( true );
-					}
-				} else {
-					setError(
-						__(
-							'No valid images found in this album.',
-							'google-photos-album'
-						)
-					);
-				}
-			} )
-			.catch( ( err ) => {
-				setError(
-					sprintf(
-						/* translators: %s: error message */
-						__( 'Verification failed: %s', 'google-photos-album' ),
-						err.message ||
-							__( 'Unknown error', 'google-photos-album' )
-					)
-				);
-			} )
-			.finally( () => {
-				setLoading( false );
-			} );
-	};
-
-	/**
-	 * Re-syncs the album by fetching fresh images and importing only new ones.
-	 * Resets the UI to show the import process as if it's a fresh block.
-	 */
-	const reSyncAlbum = () => {
-		if ( ! albumUrl || isImporting || loading ) {
-			return;
-		}
-
-		// Reset the block state to look like a fresh import
-		setAttributes( {
-			allImages: [],
-			importCompleted: false,
-		} );
-		setError( '' );
-		setLoading( true );
-		setDone( false );
-		setIsImporting( false );
-		setFailedImports( [] );
-
-		// Call the same verify endpoint to get fresh album data
-		apiFetch( {
-			path: addQueryArgs( '/google-photos-album/v1/album/verify', {
-				url: albumUrl,
-			} ),
-		} )
-			.then( ( response ) => {
-				if ( response.valid && response.images.length > 0 ) {
-					setAttributes( {
-						albumUrl,
-						allImages: response.images,
-						imported: response.imported || [],
-					} );
-
-					// Start importing immediately after verify (only new images will be processed)
-					setIsImporting( true );
-				} else {
-					setError(
-						__(
-							'No valid images found in this album.',
-							'google-photos-album'
-						)
-					);
-				}
-			} )
-			.catch( ( err ) => {
-				setError(
-					sprintf(
-						/* translators: %s: error message */
-						__( 'Re-sync failed: %s', 'google-photos-album' ),
-						err.message ||
-							__( 'Unknown error', 'google-photos-album' )
-					)
-				);
-			} )
-			.finally( () => {
-				setLoading( false );
-			} );
+		replaceInnerBlocks( clientId, [ galleryBlock ], true );
 	};
 
 	useEffect( () => {
-		if ( ! isImporting || ! allImages.length || done ) {
-			return;
+		if ( importCompleted ) {
+			createGalleryBlock( importedImages );
 		}
-
-		// Find the next image that hasn't been imported yet or failed
-		// Compare using original_url field from imported items and failed imports
-		const processedCount = imported.length + failedImports.length;
-		let nextImage = allImages.find( ( img ) => {
-			const candidateUrl = img?.download_url || img?.url || img;
-			return (
-				! imported.some(
-					( importedItem ) =>
-						importedItem.original_url === candidateUrl
-				) &&
-				! failedImports.some(
-					( failedItem ) => failedItem.original_url === candidateUrl
-				)
-			);
-		} );
-
-		if ( ! nextImage && processedCount < allImages.length ) {
-			nextImage = allImages[ processedCount ];
-		}
-
-		if ( ! nextImage ) {
-			// All images have been processed (either imported or failed)
-			handleImportCompletion( imported.length, failedImports.length );
-			return;
-		}
-
-		const importImage = () => {
-			apiFetch( {
-				path: '/google-photos-album/v1/album/import',
-				method: 'POST',
-				data: {
-					image_url: nextImage.download_url,
-					post_id: postId,
-					album_url: albumUrl,
-				},
-			} )
-				.then( ( result ) => {
-					if ( result.success ) {
-						const newImportedItem = {
-							id: result.id,
-							url: result.url,
-							original_url: result.original_url,
-						};
-						const updated = [ ...imported, newImportedItem ];
-						setAttributes( { imported: updated } );
-
-						if (
-							updated.length + failedImports.length ===
-							allImages.length
-						) {
-							handleImportCompletion(
-								updated.length,
-								failedImports.length,
-								updated
-							);
-						}
-					}
-				} )
-				.catch( ( err ) => {
-					const failedItem = {
-						original_url: nextImage.download_url,
-						error:
-							err.message ||
-							__( 'Unknown error', 'google-photos-album' ),
-					};
-					const updatedFailed = [ ...failedImports, failedItem ];
-					handleSingleImageFailure( nextImage, err, updatedFailed );
-				} );
-		};
-
-		importImage();
-	}, [
-		isImporting,
-		imported.length,
-		failedImports.length,
-		allImages.length,
-		done,
-		postId,
-		albumUrl,
-	] ); // Updated dependencies
+	}, [ importCompleted ] );
 
 	return (
 		<div { ...blockProps }>
-			<AlbumInspectorControls
-				albumUrl={ albumUrl }
-				allImages={ allImages }
-				imported={ imported }
-			/>
-
-			{ importCompleted && albumUrl && (
-				<BlockControls>
+			{ importCompleted && (
+				<BlockControls group="other">
 					<ToolbarButton
 						icon="update"
-						label={
-							isImporting || loading
-								? __( 'Resyncing…', 'google-photos-album' )
-								: __( 'Re-sync', 'google-photos-album' )
-						}
-						onClick={ reSyncAlbum }
+						label={ __( 'Re-sync', 'google-photos-album' ) }
+						onClick={ verifyAlbum }
+						disabled={ loading || importing }
 					/>
 				</BlockControls>
 			) }
@@ -472,73 +287,76 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 										),
 									}
 								) }
-								disabled={ isImporting || loading }
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
 							/>
 						</FlexItem>
 						<FlexItem>
 							<Button
 								variant="primary"
 								onClick={ verifyAlbum }
-								disabled={
-									! albumUrl || isImporting || loading
-								}
-								isBusy={ loading || isImporting }
+								isBusy={ loading || importing }
+								disabled={ loading || importing }
 							>
 								{ loading &&
-									__( 'Verifying…', 'google-photos-album' ) }
+									__(
+										'Verifying Album...',
+										'google-photos-album'
+									) }
+								{ importing &&
+									__(
+										'Importing Images...',
+										'google-photos-album'
+									) }
 								{ ! loading &&
-									isImporting &&
-									__( 'Importing…', 'google-photos-album' ) }
-								{ ! loading &&
-									! isImporting &&
+									! importing &&
 									__(
 										'Start Import',
 										'google-photos-album'
 									) }
 							</Button>
 						</FlexItem>
-						{ allImages.length > 0 && isImporting && (
-							<div className="import-progress">
-								<div className="import-progress-bar">
-									<ProgressBar value={ progress } />
-								</div>
-								{ sprintf(
-									/* translators: 1: number of processed images, 2: total number of images */
-									_n(
-										'Processing %1$d out of %2$d image…',
-										'Processing %1$d out of %2$d images…',
-										allImages.length,
-										'google-photos-album'
-									),
-									imported.length + failedImports.length,
-									allImages.length
-								) }
-								{ failedImports.length > 0 && (
-									<div className="import-errors">
+
+						{ importing && allImages && allImages.length > 0 && (
+							<FlexItem>
+								<div className="import-progress">
+									<div className="import-progress-bar">
+										<ProgressBar value={ importProgress } />
+									</div>
+									<div className="import-progress-text">
 										{ sprintf(
-											/* translators: %d: number of failed imports */
-											_n(
-												'%d image failed to import',
-												'%d images failed to import',
-												failedImports.length,
+											__(
+												'Processing %1$d out of %2$d images…',
 												'google-photos-album'
 											),
-											failedImports.length
+											Math.ceil(
+												( importProgress / 100 ) *
+													allImages.length
+											),
+											allImages.length
 										) }
 									</div>
-								) }
-							</div>
+								</div>
+							</FlexItem>
 						) }
 					</Flex>
 					{ error && (
-						<Notice status="error" isDismissible={ false }>
+						<Notice
+							status="error"
+							onRemove={ () => setError( null ) }
+						>
 							{ error }
 						</Notice>
 					) }
 				</Placeholder>
 			) }
 
-			{ importCompleted && <InnerBlocks renderAppender={ false } /> }
+			{ importCompleted && (
+				<InnerBlocks
+					renderAppender={ false }
+					templateLock={ 'insert' }
+				/>
+			) }
 		</div>
 	);
 }
