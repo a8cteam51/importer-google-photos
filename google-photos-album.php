@@ -16,7 +16,7 @@
  * Description:             Import your Google Photos album images into your WordPress site and display them in a beautiful gallery.
  * Version:                 1.0.0-beta.3
  * Requires at least:       6.7
- * Tested up to:            6.7
+ * Tested up to:            6.8
  * Requires PHP:            8.2
  * Author:                  WordPress.com Special Projects
  * Author URI:              https://wpspecialprojects.wordpress.com
