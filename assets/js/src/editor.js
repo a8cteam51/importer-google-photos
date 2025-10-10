@@ -2,7 +2,6 @@ import { addFilter } from '@wordpress/hooks';
 import { Fragment, useState } from '@wordpress/element';
 import { useBlockEditContext } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import GooglePhotosIcon from './components/GooglePhotosIcon';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
@@ -70,15 +69,9 @@ function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
 			<Button
 				__next40pxDefaultSize={ true }
 				variant="secondary"
-				icon={
-					<GooglePhotosIcon
-						className="components-menu-items__item-icon"
-						size={ 20 }
-					/>
-				}
 				onClick={ () => setIsOpen( true ) }
 			>
-				{ __( 'Google Photos Album', 'google-photos-album' ) }
+				{ __( 'Import from Google Photos', 'importer-google-photos' ) }
 			</Button>
 			<GooglePhotosAlbumModal
 				isOpen={ isOpen }
