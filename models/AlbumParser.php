@@ -30,7 +30,7 @@ final class AlbumParser {
 	 *
 	 * @var string
 	 */
-	private ?string $id = null;
+	private ?string $album_id = null;
 
 	/**
 	 * The parsed Album.
@@ -68,9 +68,9 @@ final class AlbumParser {
 		}
 
 		if ( \str_starts_with( $this->url, 'https://photos.google.com/share/' ) ) {
-			$this->id = \strstr( $this->url, '?key', true );
+			$this->album_id = \strstr( $this->url, '?key', true );
 		} else {
-			$this->id = \strstr( $response['http_response']->get_response_object()->url, '?key', true );
+			$this->album_id = \strstr( $response['http_response']->get_response_object()->url, '?key', true );
 		}
 
 		// The data we need is in an object that's used to initialize the AF_initDataCallback function.
@@ -143,6 +143,6 @@ final class AlbumParser {
 	 * @return string|null
 	 */
 	public function get_album_id(): ?string {
-		return $this->id;
+		return $this->album_id;
 	}
 }

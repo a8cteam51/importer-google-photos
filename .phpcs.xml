@@ -7,7 +7,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="google-photos-album"/>
+				<element value="importer-google-photos"/>
 			</property>
 		</properties>
 	</rule>

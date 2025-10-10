@@ -72,7 +72,7 @@ final class RestApi {
 						'sanitize_callback' => 'absint',
 						'default'           => 0,
 					),
-					'album_id' => array(
+					'album_id'  => array(
 						'required'          => true,
 						'type'              => 'string',
 						'validate_callback' => array( $this, 'validate_album_id' ),
