@@ -19,12 +19,12 @@ export default function AlbumInspectorControls( {
 	return (
 		<InspectorControls>
 			<PanelBody
-				title={ __( 'Album Details', 'google-photos-album' ) }
+				title={ __( 'Album Details', 'importer-google-photos' ) }
 				initialOpen={ true }
 			>
 				<PanelRow>
 					<BaseControl
-						label={ __( 'Album URL', 'google-photos-album' ) }
+						label={ __( 'Album URL', 'importer-google-photos' ) }
 						id="album-url"
 						help={
 							shouldShowAlbumUrl && albumUrl ? (
@@ -35,7 +35,10 @@ export default function AlbumInspectorControls( {
 									{ albumUrl }
 								</ExternalLink>
 							) : (
-								__( 'No album URL set', 'google-photos-album' )
+								__(
+									'No album URL set',
+									'importer-google-photos'
+								)
 							)
 						}
 					/>
@@ -46,7 +49,7 @@ export default function AlbumInspectorControls( {
 						<BaseControl
 							label={ __(
 								'Import Status',
-								'google-photos-album'
+								'importer-google-photos'
 							) }
 							id="import-status"
 						>
@@ -58,7 +61,7 @@ export default function AlbumInspectorControls( {
 												'Importing: %1$d out of %2$d image',
 												'Importing: %1$d out of %2$d images',
 												allImages.length,
-												'google-photos-album'
+												'importer-google-photos'
 											),
 											imported.length,
 											allImages.length
@@ -69,7 +72,7 @@ export default function AlbumInspectorControls( {
 												'Completed: %d image imported',
 												'Completed: %d images imported',
 												imported.length,
-												'google-photos-album'
+												'importer-google-photos'
 											),
 											imported.length
 									  ) }

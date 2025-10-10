@@ -146,13 +146,13 @@ function google_photos_album_output_requirements_error( $error ) {
 		static function () use ( $error ) {
 			$requirements_error = \wp_sprintf(
 				/* translators: 1: Plugin name, 2: Plugin version */
-				__( '<strong>%1$s (version %2$s)</strong> could not be initialized.', 'google-photos-album' ),
+				__( '<strong>%1$s (version %2$s)</strong> could not be initialized.', 'importer-google-photos' ),
 				google_photos_album_get_plugin_metadata( 'Name' ),
 				google_photos_album_get_plugin_metadata( 'Version' )
 			);
 
 			if ( $error->has_errors() ) {
-				$requirements_error .= ' ' . \__( 'Your environment does not meet all the system requirements listed below:', 'google-photos-album' );
+				$requirements_error .= ' ' . \__( 'Your environment does not meet all the system requirements listed below:', 'importer-google-photos' );
 				$requirements_error .= '<ul class="ul-disc">';
 
 				foreach ( $error->get_error_codes() as $error_code ) {
@@ -165,7 +165,7 @@ function google_photos_album_output_requirements_error( $error ) {
 						case 'plugin_wp_incompatible':
 							$error_message = wp_sprintf(
 								/* translators: 1: Current WP version, 2: Minimum WP version */
-								__( 'Current <em>WordPress version (%1$s)</em> does not meet minimum required version of %2$s.', 'google-photos-album' ),
+								__( 'Current <em>WordPress version (%1$s)</em> does not meet minimum required version of %2$s.', 'importer-google-photos' ),
 								get_bloginfo( 'version' ),
 								$error_data['requires_wp']
 							);
@@ -173,13 +173,13 @@ function google_photos_album_output_requirements_error( $error ) {
 						case 'plugin_php_incompatible':
 							$error_message = wp_sprintf(
 								/* translators: 1: Current PHP version, 2: Minimum PHP version */
-								__( 'Current <em>PHP version (%1$s)</em> does not meet minimum required version of %2$s.', 'google-photos-album' ),
+								__( 'Current <em>PHP version (%1$s)</em> does not meet minimum required version of %2$s.', 'importer-google-photos' ),
 								PHP_VERSION,
 								$error_data['requires_php']
 							);
 							break;
 						case 'missing_autoloader':
-							$error_message = __( 'The autoloader file is missing. Please run <code>composer install</code> to generate it.', 'google-photos-album' );
+							$error_message = __( 'The autoloader file is missing. Please run <code>composer install</code> to generate it.', 'importer-google-photos' );
 							break;
 						default:
 							$error_message = $error->get_error_message( $error_code );

@@ -132,7 +132,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 						'Successfully imported %d image from Google Photos album.',
 						'Successfully imported %d images from Google Photos album.',
 						newImportedImages.length,
-						'google-photos-album'
+						'importer-google-photos'
 					),
 					newImportedImages.length
 				),
@@ -148,7 +148,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 				'error',
 				__(
 					'Failed to import images from Google Photos album.',
-					'google-photos-album'
+					'importer-google-photos'
 				),
 				{
 					type: 'snackbar',
@@ -196,7 +196,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 					setError(
 						__(
 							'Invalid album URL or the album is not publicly accessible.',
-							'google-photos-album'
+							'importer-google-photos'
 						)
 					);
 				}
@@ -242,7 +242,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 				<BlockControls group="other">
 					<ToolbarButton
 						icon="update"
-						label={ __( 'Re-sync', 'google-photos-album' ) }
+						label={ __( 'Re-sync', 'importer-google-photos' ) }
 						onClick={ verifyAlbum }
 						disabled={ loading || importing }
 					/>
@@ -254,11 +254,11 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 					icon="format-gallery"
 					label={ __(
 						'Import Google Photos Album',
-						'google-photos-album'
+						'importer-google-photos'
 					) }
 					instructions={ __(
 						'Paste a public album URL to begin importing images. This is the URL you get through Share > Copy link.',
-						'google-photos-album'
+						'importer-google-photos'
 					) }
 				>
 					<Flex direction="column" gap={ 3 }>
@@ -266,7 +266,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 							<TextControl
 								label={ __(
 									'Google Photos Album URL',
-									'google-photos-album'
+									'importer-google-photos'
 								) }
 								value={ albumUrl }
 								onChange={ ( value ) =>
@@ -274,12 +274,12 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 								}
 								placeholder={ __(
 									'https://photos.app.goo.gl/…',
-									'google-photos-album'
+									'importer-google-photos'
 								) }
 								help={ createInterpolateElement(
 									__(
 										'See <link>Google Photos Help</link> for how to get your public link.',
-										'google-photos-album'
+										'importer-google-photos'
 									),
 									{
 										link: (
@@ -301,18 +301,18 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 								{ loading &&
 									__(
 										'Verifying Album...',
-										'google-photos-album'
+										'importer-google-photos'
 									) }
 								{ importing &&
 									__(
 										'Importing Images...',
-										'google-photos-album'
+										'importer-google-photos'
 									) }
 								{ ! loading &&
 									! importing &&
 									__(
 										'Start Import',
-										'google-photos-album'
+										'importer-google-photos'
 									) }
 							</Button>
 						</FlexItem>
@@ -327,7 +327,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 										{ sprintf(
 											__(
 												'Processing %1$d out of %2$d images…',
-												'google-photos-album'
+												'importer-google-photos'
 											),
 											Math.ceil(
 												( importProgress / 100 ) *

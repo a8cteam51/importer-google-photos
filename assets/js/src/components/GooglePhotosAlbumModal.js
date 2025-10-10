@@ -39,14 +39,15 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 					setError(
 						__(
 							'No valid images found in this album.',
-							'google-photos-album'
+							'importer-google-photos'
 						)
 					);
 				}
 			} )
 			.catch( ( err ) =>
 				setError(
-					err?.message || __( 'Unknown error', 'google-photos-album' )
+					err?.message ||
+						__( 'Unknown error', 'importer-google-photos' )
 				)
 			)
 			.finally( () => setLoading( false ) );
@@ -79,10 +80,10 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 			className="gpa-modal"
 			title={
 				importing
-					? __( 'Inserting media', 'google-photos-album' )
+					? __( 'Inserting media', 'importer-google-photos' )
 					: __(
 							'Select images from Google Photos album',
-							'google-photos-album'
+							'importer-google-photos'
 					  )
 			}
 			onRequestClose={ onClose }
@@ -90,10 +91,12 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 			<div className="gpa-modal__body">
 				<div className="gpa-modal__header">
 					<TextControl
-						label={ __( 'Album URL', 'google-photos-album' ) }
+						label={ __( 'Album URL', 'importer-google-photos' ) }
 						value={ albumUrl }
 						onChange={ setAlbumUrl }
 						placeholder="https://photos.app.goo.gl/…"
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 					/>
 					<Button
 						variant="secondary"
@@ -101,7 +104,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 						disabled={ ! albumUrl || loading }
 						isBusy={ loading }
 					>
-						{ __( 'Load album', 'google-photos-album' ) }
+						{ __( 'Load album', 'importer-google-photos' ) }
 					</Button>
 					{ error && <p className="gpa-modal__error">{ error }</p> }
 				</div>
@@ -116,7 +119,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 							className="gpa-modal__grid"
 							aria-label={ __(
 								'Media list',
-								'google-photos-album'
+								'importer-google-photos'
 							) }
 							render={ <ul /> }
 							aria-multiselectable={ true }
@@ -132,7 +135,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 										aria-selected={ checked }
 										aria-label={ __(
 											'Select image',
-											'google-photos-album'
+											'importer-google-photos'
 										) }
 										render={ <li role="option" /> }
 										onClick={ () =>
@@ -171,10 +174,13 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 								isBusy={ importing }
 							>
 								{ importing
-									? __( 'Inserting…', 'google-photos-album' )
+									? __(
+											'Inserting…',
+											'importer-google-photos'
+									  )
 									: __(
 											'Insert selected images',
-											'google-photos-album'
+											'importer-google-photos'
 									  ) }
 							</Button>
 						</div>

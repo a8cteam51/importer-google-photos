@@ -1,4 +1,4 @@
-# Google Photos Album
+# Album Importer for Google Photos
 
 **Contributors:** wpcomspecialprojects
 **Tags:**
