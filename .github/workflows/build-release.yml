@@ -2,7 +2,8 @@ name: Build and Release
 
 on:
   release:
-    types: [ released ]
+    types:
+      - created
 
 jobs:
   build:
@@ -21,7 +22,7 @@ jobs:
           npm run build
 
       - name: Zip Folder
-        run: zip -r ${{ github.event.repository.name }}.zip . -x ".git/*" ".github/*" "node_modules/*" "tests/*" ".gitignore" ".editorconfig" ".phpcs.xml" "composer.json" "composer.lock" "package.json" "package-lock.json"
+        run: git archive --prefix=${{ github.event.repository.name }}/ HEAD -o ${{ github.event.repository.name }}.zip
 
       - name: Release
         uses: softprops/action-gh-release@v2
