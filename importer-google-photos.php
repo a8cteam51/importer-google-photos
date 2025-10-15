@@ -36,18 +36,6 @@ define( 'GOOGLE_PHOTOS_ALBUM_DIR_URL', plugin_dir_url( __FILE__ ) );
 // Load the rest of the bootstrap functions.
 require_once GOOGLE_PHOTOS_ALBUM_DIR_PATH . '/functions-bootstrap.php';
 
-// Load plugin translations so they are available even for the error admin notices.
-add_action(
-	'init',
-	static function () {
-		load_plugin_textdomain(
-			google_photos_album_get_plugin_metadata( 'TextDomain' ),
-			false,
-			dirname( GOOGLE_PHOTOS_ALBUM_BASENAME ) . google_photos_album_get_plugin_metadata( 'DomainPath' )
-		);
-	}
-);
-
 // Load the autoloader.
 if ( ! is_file( GOOGLE_PHOTOS_ALBUM_DIR_PATH . '/vendor/autoload.php' ) ) {
 	google_photos_album_output_requirements_error( new WP_Error( 'missing_autoloader' ) );
