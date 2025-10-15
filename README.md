@@ -1,14 +1,5 @@
 # Album Importer for Google Photos
 
-**Contributors:** wpcomspecialprojects
-**Tags:**
-**Requires at least:** 6.7
-**Tested up to:** 6.8
-**Requires PHP:** 8.2
-**Stable tag:** 1.0.0-beta.3
-**License:** GPLv3 or later
-**License URI:** http://www.gnu.org/licenses/gpl-3.0.html
-
 Import your Google Photos album images into your WordPress site and display them in a beautiful gallery.
 
 ## Description

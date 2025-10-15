@@ -35,8 +35,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 	const { createNotice } = useDispatch( noticesStore );
 
 	const blockProps = useBlockProps();
-	const { albumUrl, importedImages, allImages, importCompleted, albumId } =
-		attributes;
+	const { albumUrl, importedImages, allImages, importCompleted } = attributes;
 
 	const [ error, setError ] = useState( null );
 	const [ loading, setLoading ] = useState( false );
@@ -51,7 +50,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 	/**
 	 * Import a single image from the album
 	 * @param {string} imageUrl - The Google Photos image URL
-	 * @param {string} albumId - The album ID
+	 * @param {string} albumId  - The album ID
 	 * @return {Promise} Promise that resolves to the import result
 	 */
 	const importSingleImage = async ( imageUrl, albumId ) => {
@@ -68,28 +67,32 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 
 	/**
 	 * Import all images that haven't been imported yet
-	 * @param {Array} allImages - All images from the album
-	 * @param {Array} importedImages - Already imported images
-	 * @param {string} albumId - The album ID
+	 * @param {Array}  allImagesInAlbum      - All images from the album
+	 * @param {Array}  alreadyImportedImages - Already imported images
+	 * @param {string} albumId               - The album ID
 	 */
-	const importImages = async ( allImages, importedImages, albumId ) => {
+	const importImages = async (
+		allImagesInAlbum,
+		alreadyImportedImages,
+		albumId
+	) => {
 		const importedUrls = new Set(
-			importedImages.map( ( img ) => img.download_url )
+			alreadyImportedImages.map( ( img ) => img.download_url )
 		);
-		const imagesToImport = allImages.filter(
+		const imagesToImport = allImagesInAlbum.filter(
 			( img ) => ! importedUrls.has( img.download_url )
 		);
 
 		if ( imagesToImport.length === 0 ) {
 			setAttributes( { importCompleted: true } );
-			createGalleryBlock( importedImages );
+			createGalleryBlock( alreadyImportedImages );
 			return;
 		}
 
 		setImporting( true );
 		setImportProgress( 0 );
 
-		const newImportedImages = [ ...importedImages ];
+		const newImportedImages = [ ...alreadyImportedImages ];
 		const totalImages = imagesToImport.length;
 
 		try {
@@ -113,6 +116,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 						setImportProgress( ( ( i + 1 ) / totalImages ) * 100 );
 					}
 				} catch ( imageError ) {
+					// eslint-disable-next-line no-console
 					console.error(
 						`Failed to import image ${ image.url }:`,
 						imageError
@@ -128,6 +132,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 			createNotice(
 				'success',
 				sprintf(
+					// translators: %d: number of imported images
 					_n(
 						'Successfully imported %d image from Google Photos album.',
 						'Successfully imported %d images from Google Photos album.',
@@ -141,8 +146,8 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 					isDismissible: true,
 				}
 			);
-		} catch ( error ) {
-			setError( error.message );
+		} catch ( apiFetchError ) {
+			setError( apiFetchError.message );
 
 			createNotice(
 				'error',
@@ -171,6 +176,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 			} ),
 		} )
 			.then( ( response ) => {
+				// eslint-disable-next-line no-console
 				console.log( response );
 
 				if ( response.valid ) {
@@ -201,8 +207,8 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 					);
 				}
 			} )
-			.catch( ( error ) => {
-				setError( error.message );
+			.catch( ( apiFetchError ) => {
+				setError( apiFetchError.message );
 			} )
 			.finally( () => {
 				setLoading( false );
@@ -211,7 +217,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 
 	/**
 	 * Create a gallery block with the imported images
-	 * @param {Array} importedImages - The imported images
+	 * @param {Array} images - The imported images
 	 */
 	const createGalleryBlock = ( images ) => {
 		const galleryBlock = createBlock(
@@ -303,12 +309,12 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 							>
 								{ loading &&
 									__(
-										'Verifying Album...',
+										'Verifying Album…',
 										'importer-google-photos'
 									) }
 								{ importing &&
 									__(
-										'Importing Images...',
+										'Importing Images…',
 										'importer-google-photos'
 									) }
 								{ ! loading &&
@@ -328,6 +334,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 									</div>
 									<div className="import-progress-text">
 										{ sprintf(
+											// translators: %1$d: number of images processed, %2$d: total number of images
 											__(
 												'Processing %1$d out of %2$d images…',
 												'importer-google-photos'

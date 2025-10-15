@@ -5,7 +5,7 @@ import {
 	ExternalLink,
 } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 export default function AlbumInspectorControls( { albumUrl } ) {
 	return (
