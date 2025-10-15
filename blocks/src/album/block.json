@@ -1,9 +1,9 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"name": "google-photos-album/album",
+	"name": "importer-google-photos/album",
 	"version": "0.1.0",
-	"title": "Google Photos Album",
+	"title": "Album Importer for Google Photos",
 	"category": "widgets",
 	"icon": "format-gallery",
 	"description": "Import your Google Photos album images into your WordPress site and display them in a beautiful gallery.",

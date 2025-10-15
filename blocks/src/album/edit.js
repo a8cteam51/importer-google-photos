@@ -239,14 +239,17 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 	return (
 		<div { ...blockProps }>
 			{ importCompleted && (
-				<BlockControls group="other">
-					<ToolbarButton
-						icon="update"
-						label={ __( 'Re-sync', 'importer-google-photos' ) }
-						onClick={ verifyAlbum }
-						disabled={ loading || importing }
-					/>
-				</BlockControls>
+				<>
+					<BlockControls group="other">
+						<ToolbarButton
+							icon="update"
+							label={ __( 'Re-sync', 'importer-google-photos' ) }
+							onClick={ verifyAlbum }
+							disabled={ loading || importing }
+						/>
+					</BlockControls>
+					<AlbumInspectorControls albumUrl={ albumUrl } />
+				</>
 			) }
 
 			{ ! importCompleted && (

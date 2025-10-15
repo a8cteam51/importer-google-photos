@@ -30,7 +30,7 @@ final class AlbumParser {
 	 *
 	 * @var string
 	 */
-	private ?string $album_id = null;
+	private string $album_id;
 
 	/**
 	 * The parsed Album.
@@ -67,11 +67,7 @@ final class AlbumParser {
 			return null;
 		}
 
-		if ( \str_starts_with( $this->url, 'https://photos.google.com/share/' ) ) {
-			$this->album_id = \strstr( $this->url, '?key', true );
-		} else {
-			$this->album_id = \strstr( $response['http_response']->get_response_object()->url, '?key', true );
-		}
+		$this->album_id = $this->get_album_id_from_input( $response );
 
 		// The data we need is in an object that's used to initialize the AF_initDataCallback function.
 		// Because the function expects an object, it's not valid JSON, but the `data` key which contains
@@ -140,9 +136,28 @@ final class AlbumParser {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 *
-	 * @return string|null
+	 * @return string
 	 */
-	public function get_album_id(): ?string {
+	public function get_album_id(): string {
 		return $this->album_id;
+	}
+
+	/**
+	 * Determines the album ID from the provided URL if using a share link. Otherwise,
+	 * gets the album ID from the initial album request.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @param array<string, mixed> $response The response from the API.
+	 *
+	 * @return string
+	 */
+	private function get_album_id_from_input( $response ): string {
+		if ( \str_starts_with( $this->url, 'https://photos.google.com/share/' ) ) {
+			return (string) \strstr( $this->url, '?key', true );
+		} else {
+			return (string) \strstr( $response['http_response']->get_response_object()->url, '?key', true );
+		}
 	}
 }
