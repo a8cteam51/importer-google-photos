@@ -5,6 +5,7 @@ import apiFetch from '@wordpress/api-fetch';
 
 const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 	const [ albumUrl, setAlbumUrl ] = useState( '' );
+	const [ albumId, setAlbumId ] = useState( '' );
 	const [ loading, setLoading ] = useState( false );
 	const [ error, setError ] = useState( '' );
 	const [ images, setImages ] = useState( [] );
@@ -33,6 +34,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 					response.images.length
 				) {
 					setImages( response.images );
+					setAlbumId( response.album_id );
 					setSelected( {} );
 				} else {
 					setImages( [] );
@@ -44,12 +46,12 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 					);
 				}
 			} )
-			.catch( ( err ) =>
+			.catch( ( err ) => {
 				setError(
 					err?.message ||
 						__( 'Unknown error', 'importer-google-photos' )
-				)
-			)
+				);
+			} )
 			.finally( () => setLoading( false ) );
 	};
 
@@ -64,7 +66,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 
 		setImporting( true );
 		try {
-			await onInsert( { albumUrl, urls } );
+			await onInsert( { albumId, urls } );
 		} finally {
 			setImporting( false );
 		}

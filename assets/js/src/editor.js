@@ -16,7 +16,7 @@ function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
 		[]
 	);
 
-	const onInsert = async ( { albumUrl, urls } ) => {
+	const onInsert = async ( { albumId, urls } ) => {
 		const imported = [];
 		for ( const url of urls ) {
 			try {
@@ -27,11 +27,14 @@ function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
 					data: {
 						image_url: url,
 						post_id: postId,
-						album_url: albumUrl,
+						album_id: albumId,
 					},
 				} );
 				if ( result?.success ) {
-					imported.push( { id: result.id, url: result.url } );
+					imported.push( {
+						id: result.attachment_id,
+						url: result.attachment_url,
+					} );
 				}
 			} catch ( e ) {
 				// eslint-disable-next-line no-console
@@ -46,8 +49,8 @@ function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
 				alt: '',
 				caption: '',
 				sizes: {
-					thumbnail: { url: img.url },
-					large: { url: img.url },
+					thumbnail: { url: img.attachment_url },
+					large: { url: img.attachment_url },
 				},
 			} ) );
 			if ( typeof mediaProps.onSelect === 'function' ) {
@@ -56,7 +59,6 @@ function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
 					shouldPassArray ? mediaItems : mediaItems[ 0 ]
 				);
 			}
-
 			setIsOpen( false );
 		}
 	};
@@ -85,7 +87,7 @@ function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
 // Augment the MediaUpload render to append our button next to the default placeholder button(s).
 addFilter(
 	'editor.MediaUpload',
-	'google-photos-album/mediaupload-hook',
+	'importer-google-photos/mediaupload-hook',
 	( OriginalComponent ) => ( props ) => {
 		const { name } = useBlockEditContext();
 		const { render: originalRender } = props;
