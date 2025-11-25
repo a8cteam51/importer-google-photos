@@ -1,5 +1,15 @@
-import { useMemo, useState } from '@wordpress/element';
-import { Modal, Button, TextControl, Composite } from '@wordpress/components';
+import {
+	useMemo,
+	useState,
+	createInterpolateElement,
+} from '@wordpress/element';
+import {
+	Modal,
+	Button,
+	TextControl,
+	Composite,
+	ExternalLink,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -92,11 +102,28 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 		>
 			<div className="gpa-modal__body">
 				<div className="gpa-modal__header">
+					<p className="gpa-modal__instructions">
+						{ __(
+							'Paste a public album URL to begin importing images. This is the URL you get through Share > Copy link.',
+							'importer-google-photos'
+						) }
+					</p>
 					<TextControl
 						label={ __( 'Album URL', 'importer-google-photos' ) }
 						value={ albumUrl }
 						onChange={ setAlbumUrl }
 						placeholder="https://photos.app.goo.gl/…"
+						help={ createInterpolateElement(
+							__(
+								'See <link>Google Photos Help</link> for how to get your public link.',
+								'importer-google-photos'
+							),
+							{
+								link: (
+									<ExternalLink href="https://support.google.com/photos/answer/6131416" />
+								),
+							}
+						) }
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 					/>
