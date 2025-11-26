@@ -21,8 +21,14 @@ jobs:
           npm ci
           npm run build
 
-      - name: Zip Folder
-        run: git archive --prefix=${{ github.event.repository.name }}/ HEAD -o ${{ github.event.repository.name }}.zip
+      - name: Prepare Release Directory
+        run: |
+          mkdir ${{ github.event.repository.name }}
+          cp -r importer-google-photos.php functions.php functions-bootstrap.php index.php LICENSE src includes assets blocks languages models vendor ${{ github.event.repository.name }}/
+
+      - name: Zip Release
+        run: |
+          zip -r ${{ github.event.repository.name }}.zip ./${{ github.event.repository.name }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
