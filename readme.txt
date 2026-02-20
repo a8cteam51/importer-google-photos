@@ -4,7 +4,7 @@ Tags: google photos, album, gallery, importer, media library
 Requires at least: 6.7
 Tested up to: 6.9
 Requires PHP: 8.2
-Stable tag: 1.0.0-beta.5
+Stable tag: 1.0.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
