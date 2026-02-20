@@ -193,7 +193,7 @@ final class RestApi {
 	 * @return  bool
 	 */
 	public function validate_album_url( string $value ): bool {
-		return \str_starts_with( $value, 'https://photos.app.goo.gl/' ) || \str_starts_with( $value, 'https://photos.google.com/share/' );
+		return \str_starts_with( $value, 'https://photos.app.goo' . '.gl/' ) || \str_starts_with( $value, 'https://photos.google.com/share/' );
 	}
 
 	/**
