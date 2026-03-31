@@ -1,7 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
-	"name": "importer-google-photos/album",
+	"apiVersion": 3,
+	"name": "aigp/album",
 	"version": "0.1.0",
 	"title": "Album Importer for Google Photos",
 	"category": "widgets",
@@ -55,7 +55,7 @@
 			"padding": true
 		}
 	},
-	"textdomain": "google-photos-album",
+	"textdomain": "album-importer-for-google-photos",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css"
 }

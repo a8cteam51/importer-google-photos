@@ -55,7 +55,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 	 */
 	const importSingleImage = async ( imageUrl, albumId ) => {
 		return apiFetch( {
-			path: '/google-photos-album/v1/album/import',
+			path: '/aigp/v1/album/import',
 			method: 'POST',
 			data: {
 				image_url: imageUrl,
@@ -137,7 +137,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 						'Successfully imported %d image from Google Photos album.',
 						'Successfully imported %d images from Google Photos album.',
 						newImportedImages.length,
-						'importer-google-photos'
+						'album-importer-for-google-photos'
 					),
 					newImportedImages.length
 				),
@@ -153,7 +153,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 				'error',
 				__(
 					'Failed to import images from Google Photos album.',
-					'importer-google-photos'
+					'album-importer-for-google-photos'
 				),
 				{
 					type: 'snackbar',
@@ -171,7 +171,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 		setError( null );
 
 		apiFetch( {
-			path: addQueryArgs( '/google-photos-album/v1/album/verify', {
+			path: addQueryArgs( '/aigp/v1/album/verify', {
 				url: albumUrl,
 			} ),
 		} )
@@ -202,7 +202,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 					setError(
 						__(
 							'Invalid album URL or the album is not publicly accessible.',
-							'importer-google-photos'
+							'album-importer-for-google-photos'
 						)
 					);
 				}
@@ -249,7 +249,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 					<BlockControls group="other">
 						<ToolbarButton
 							icon="update"
-							label={ __( 'Re-sync', 'importer-google-photos' ) }
+							label={ __( 'Re-sync', 'album-importer-for-google-photos' ) }
 							onClick={ verifyAlbum }
 							disabled={ loading || importing }
 						/>
@@ -263,11 +263,11 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 					icon="format-gallery"
 					label={ __(
 						'Import Google Photos Album',
-						'importer-google-photos'
+						'album-importer-for-google-photos'
 					) }
 					instructions={ __(
 						'Paste a public album URL to begin importing images. This is the URL you get through Share > Copy link.',
-						'importer-google-photos'
+						'album-importer-for-google-photos'
 					) }
 				>
 					<Flex direction="column" gap={ 3 }>
@@ -275,7 +275,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 							<TextControl
 								label={ __(
 									'Google Photos Album URL',
-									'importer-google-photos'
+									'album-importer-for-google-photos'
 								) }
 								value={ albumUrl }
 								onChange={ ( value ) =>
@@ -283,12 +283,12 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 								}
 								placeholder={ __(
 									'https://photos.app.goo.gl/…',
-									'importer-google-photos'
+									'album-importer-for-google-photos'
 								) }
 								help={ createInterpolateElement(
 									__(
 										'See <link>Google Photos Help</link> for how to get your public link.',
-										'importer-google-photos'
+										'album-importer-for-google-photos'
 									),
 									{
 										link: (
@@ -310,18 +310,18 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 								{ loading &&
 									__(
 										'Verifying Album…',
-										'importer-google-photos'
+										'album-importer-for-google-photos'
 									) }
 								{ importing &&
 									__(
 										'Importing Images…',
-										'importer-google-photos'
+										'album-importer-for-google-photos'
 									) }
 								{ ! loading &&
 									! importing &&
 									__(
 										'Start Import',
-										'importer-google-photos'
+										'album-importer-for-google-photos'
 									) }
 							</Button>
 						</FlexItem>
@@ -337,7 +337,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 											// translators: %1$d: number of images processed, %2$d: total number of images
 											__(
 												'Processing %1$d out of %2$d images…',
-												'importer-google-photos'
+												'album-importer-for-google-photos'
 											),
 											Math.ceil(
 												( importProgress / 100 ) *

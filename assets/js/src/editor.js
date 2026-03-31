@@ -22,7 +22,7 @@ function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
 			try {
 				// eslint-disable-next-line no-await-in-loop
 				const result = await apiFetch( {
-					path: '/google-photos-album/v1/album/import',
+					path: '/aigp/v1/album/import',
 					method: 'POST',
 					data: {
 						image_url: url,
@@ -73,7 +73,7 @@ function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
 				variant="secondary"
 				onClick={ () => setIsOpen( true ) }
 			>
-				{ __( 'Import from Google Photos', 'importer-google-photos' ) }
+				{ __( 'Import from Google Photos', 'album-importer-for-google-photos' ) }
 			</Button>
 			<GooglePhotosAlbumModal
 				isOpen={ isOpen }

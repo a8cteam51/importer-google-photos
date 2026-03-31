@@ -39,7 +39,7 @@ final class Blocks {
 	 * @return  void
 	 */
 	public function register_blocks(): void {
-		\register_block_type( \constant( 'GOOGLE_PHOTOS_ALBUM_DIR_PATH' ) . 'blocks/build/album' );
+		\register_block_type( \constant( 'AIGP_DIR_PATH' ) . 'blocks/build/album' );
 	}
 
 	/**
@@ -51,15 +51,15 @@ final class Blocks {
 	 * @return  void
 	 */
 	public function enqueue_block_editor_assets(): void {
-		$asset_meta = google_photos_album_get_asset_meta( 'assets/js/build/editor.js' );
+		$asset_meta = aigp_get_asset_meta( 'assets/js/build/editor.js' );
 		if ( \is_null( $asset_meta ) ) {
 			return;
 		}
 
-		$plugin_slug = google_photos_album_get_plugin_slug();
+		$plugin_slug = aigp_get_plugin_slug();
 		\wp_register_script(
 			"$plugin_slug-editor",
-			\constant( 'GOOGLE_PHOTOS_ALBUM_DIR_URL' ) . 'assets/js/build/editor.js',
+			\constant( 'AIGP_DIR_URL' ) . 'assets/js/build/editor.js',
 			$asset_meta['dependencies'],
 			$asset_meta['version'],
 			false
@@ -68,8 +68,8 @@ final class Blocks {
 		\wp_enqueue_script( "$plugin_slug-editor" );
 
 		$style_rel_path = 'assets/js/build/style-editor.css';
-		$style_path     = \constant( 'GOOGLE_PHOTOS_ALBUM_DIR_PATH' ) . $style_rel_path;
-		$style_url      = \constant( 'GOOGLE_PHOTOS_ALBUM_DIR_URL' ) . $style_rel_path;
+		$style_path     = \constant( 'AIGP_DIR_PATH' ) . $style_rel_path;
+		$style_url      = \constant( 'AIGP_DIR_URL' ) . $style_rel_path;
 
 		if ( \file_exists( $style_path ) ) {
 			\wp_enqueue_style(

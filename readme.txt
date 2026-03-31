@@ -69,6 +69,23 @@ No. A publicly shared album link is sufficient for importing.
 Yes. The plugin provides a Gutenberg block for inserting and importing the album.
 
 
+== External services ==
+
+This plugin connects to Google Photos to import album images into your WordPress media library.
+
+= Google Photos =
+
+When a user pastes a public Google Photos album URL and starts an import, the plugin:
+
+* Fetches the album page from Google Photos to parse available images.
+* Downloads each image from Google's content servers (lh3.googleusercontent.com) and saves it to the WordPress media library.
+* Makes a HEAD request to each image URL to verify availability before download.
+
+No user account or authentication data is sent to Google. Only publicly shared album URLs are accessed.
+
+* [Google Terms of Service](https://policies.google.com/terms)
+* [Google Privacy Policy](https://policies.google.com/privacy)
+
 == Changelog ==
 
 = 1.0.0-beta.3 =

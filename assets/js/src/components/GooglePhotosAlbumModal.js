@@ -33,7 +33,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 		setError( '' );
 		setLoading( true );
 		apiFetch( {
-			path: `/google-photos-album/v1/album/verify?url=${ encodeURIComponent(
+			path: `/aigp/v1/album/verify?url=${ encodeURIComponent(
 				albumUrl
 			) }`,
 		} )
@@ -51,7 +51,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 					setError(
 						__(
 							'No valid images found in this album.',
-							'importer-google-photos'
+							'album-importer-for-google-photos'
 						)
 					);
 				}
@@ -59,7 +59,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 			.catch( ( err ) => {
 				setError(
 					err?.message ||
-						__( 'Unknown error', 'importer-google-photos' )
+						__( 'Unknown error', 'album-importer-for-google-photos' )
 				);
 			} )
 			.finally( () => setLoading( false ) );
@@ -89,34 +89,34 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 	return (
 		<Modal
 			isFullScreen={ true }
-			className="gpa-modal"
+			className="aigp-modal"
 			title={
 				importing
-					? __( 'Inserting media', 'importer-google-photos' )
+					? __( 'Inserting media', 'album-importer-for-google-photos' )
 					: __(
 							'Select images from Google Photos album',
-							'importer-google-photos'
+							'album-importer-for-google-photos'
 					  )
 			}
 			onRequestClose={ onClose }
 		>
-			<div className="gpa-modal__body">
-				<div className="gpa-modal__header">
-					<p className="gpa-modal__instructions">
+			<div className="aigp-modal__body">
+				<div className="aigp-modal__header">
+					<p className="aigp-modal__instructions">
 						{ __(
 							'Paste a public album URL to begin importing images. This is the URL you get through Share > Copy link.',
-							'importer-google-photos'
+							'album-importer-for-google-photos'
 						) }
 					</p>
 					<TextControl
-						label={ __( 'Album URL', 'importer-google-photos' ) }
+						label={ __( 'Album URL', 'album-importer-for-google-photos' ) }
 						value={ albumUrl }
 						onChange={ setAlbumUrl }
 						placeholder="https://photos.app.goo.gl/…"
 						help={ createInterpolateElement(
 							__(
 								'See <link>Google Photos Help</link> for how to get your public link.',
-								'importer-google-photos'
+								'album-importer-for-google-photos'
 							),
 							{
 								link: (
@@ -133,22 +133,22 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 						disabled={ ! albumUrl || loading }
 						isBusy={ loading }
 					>
-						{ __( 'Load album', 'importer-google-photos' ) }
+						{ __( 'Load album', 'album-importer-for-google-photos' ) }
 					</Button>
-					{ error && <p className="gpa-modal__error">{ error }</p> }
+					{ error && <p className="aigp-modal__error">{ error }</p> }
 				</div>
 				<div
-					className={ `gpa-modal__content${
+					className={ `aigp-modal__content${
 						importing ? ' is-busy' : ''
 					}` }
 				>
 					{ images.length > 0 && (
 						<Composite
 							role="listbox"
-							className="gpa-modal__grid"
+							className="aigp-modal__grid"
 							aria-label={ __(
 								'Media list',
-								'importer-google-photos'
+								'album-importer-for-google-photos'
 							) }
 							render={ <ul /> }
 							aria-multiselectable={ true }
@@ -160,11 +160,11 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 								return (
 									<Composite.Item
 										key={ previewUrl }
-										className="gpa-modal__item"
+										className="aigp-modal__item"
 										aria-selected={ checked }
 										aria-label={ __(
 											'Select image',
-											'importer-google-photos'
+											'album-importer-for-google-photos'
 										) }
 										render={ <li role="option" /> }
 										onClick={ () =>
@@ -173,21 +173,21 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 									>
 										<button
 											type="button"
-											className={ `gpa-modal__item-button${
+											className={ `aigp-modal__item-button${
 												checked ? ' is-selected' : ''
 											}` }
 										>
-											<span className="gpa-modal__checkbox-badge">
+											<span className="aigp-modal__checkbox-badge">
 												✓
 											</span>
 											{ checked && (
-												<span className="gpa-modal__selection-overlay" />
+												<span className="aigp-modal__selection-overlay" />
 											) }
 										</button>
 										<img
 											src={ previewUrl }
 											alt=""
-											className="gpa-modal__thumb"
+											className="aigp-modal__thumb"
 										/>
 									</Composite.Item>
 								);
@@ -195,7 +195,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 						</Composite>
 					) }
 					{ images.length > 0 && (
-						<div className="gpa-modal__footer">
+						<div className="aigp-modal__footer">
 							<Button
 								variant="primary"
 								onClick={ insert }
@@ -205,11 +205,11 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 								{ importing
 									? __(
 											'Inserting…',
-											'importer-google-photos'
+											'album-importer-for-google-photos'
 									  )
 									: __(
 											'Insert selected images',
-											'importer-google-photos'
+											'album-importer-for-google-photos'
 									  ) }
 							</Button>
 						</div>

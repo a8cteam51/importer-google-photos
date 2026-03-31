@@ -1,5 +1,5 @@
 {
-  "name": "a8cteam51/importer-google-photos",
+  "name": "a8cteam51/album-importer-for-google-photos",
   "type": "wordpress-plugin",
 
   "description": "",
@@ -67,8 +67,8 @@
       "@i18n:makemo",
       "@i18n:makephp"
     ],
-    "i18n:makepot": "wp i18n make-pot ./ --slug=importer-google-photos",
-    "i18n:updatepo": "wp i18n update-po ./languages/importer-google-photos.pot",
+    "i18n:makepot": "wp i18n make-pot ./ --slug=album-importer-for-google-photos",
+    "i18n:updatepo": "wp i18n update-po ./languages/album-importer-for-google-photos.pot",
     "i18n:makemo": "wp i18n make-mo ./languages/",
     "i18n:makephp": "wp i18n make-php ./languages/",
 
