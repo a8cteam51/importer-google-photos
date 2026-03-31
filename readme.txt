@@ -79,7 +79,7 @@ When a user pastes a public Google Photos album URL and starts an import, the pl
 
 * Fetches the album page from Google Photos to parse available images.
 * Downloads each image from Google's content servers (lh3.googleusercontent.com) and saves it to the WordPress media library.
-* Makes a HEAD request to each image URL to verify availability before download.
+* Makes a HEAD request to each image URL to read the Content-Disposition header for better filename inference; the download still proceeds even if this request fails.
 
 No user account or authentication data is sent to Google. Only publicly shared album URLs are accessed.
 

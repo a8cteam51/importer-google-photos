@@ -10,7 +10,7 @@ import {
 	Composite,
 	ExternalLink,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
 const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
@@ -165,7 +165,7 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 							render={ <ul /> }
 							aria-multiselectable={ true }
 						>
-							{ images.map( ( img ) => {
+							{ images.map( ( img, index ) => {
 								const previewUrl = img?.url;
 								const checked = !! selected[ previewUrl ];
 
@@ -174,9 +174,13 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 										key={ previewUrl }
 										className="aigp-modal__item"
 										aria-selected={ checked }
-										aria-label={ __(
-											'Select image',
-											'album-importer-for-google-photos'
+										aria-label={ sprintf(
+											/* translators: %d: image number in the album grid */
+											__(
+												'Image %d',
+												'album-importer-for-google-photos'
+											),
+											index + 1
 										) }
 										render={ <li role="option" /> }
 										onClick={ () =>
