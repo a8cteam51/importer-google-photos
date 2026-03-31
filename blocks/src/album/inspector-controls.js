@@ -11,12 +11,18 @@ export default function AlbumInspectorControls( { albumUrl } ) {
 	return (
 		<InspectorControls>
 			<PanelBody
-				title={ __( 'Album Details', 'album-importer-for-google-photos' ) }
+				title={ __(
+					'Album Details',
+					'album-importer-for-google-photos'
+				) }
 				initialOpen={ true }
 			>
 				<PanelRow>
 					<BaseControl
-						label={ __( 'Album URL', 'album-importer-for-google-photos' ) }
+						label={ __(
+							'Album URL',
+							'album-importer-for-google-photos'
+						) }
 						id="album-url"
 						help={
 							<ExternalLink

@@ -59,7 +59,10 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 			.catch( ( err ) => {
 				setError(
 					err?.message ||
-						__( 'Unknown error', 'album-importer-for-google-photos' )
+						__(
+							'Unknown error',
+							'album-importer-for-google-photos'
+						)
 				);
 			} )
 			.finally( () => setLoading( false ) );
@@ -92,7 +95,10 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 			className="aigp-modal"
 			title={
 				importing
-					? __( 'Inserting media', 'album-importer-for-google-photos' )
+					? __(
+							'Inserting media',
+							'album-importer-for-google-photos'
+					  )
 					: __(
 							'Select images from Google Photos album',
 							'album-importer-for-google-photos'
@@ -109,7 +115,10 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 						) }
 					</p>
 					<TextControl
-						label={ __( 'Album URL', 'album-importer-for-google-photos' ) }
+						label={ __(
+							'Album URL',
+							'album-importer-for-google-photos'
+						) }
 						value={ albumUrl }
 						onChange={ setAlbumUrl }
 						placeholder="https://photos.app.goo.gl/…"
@@ -133,7 +142,10 @@ const GooglePhotosAlbumModal = ( { isOpen, onClose, onInsert } ) => {
 						disabled={ ! albumUrl || loading }
 						isBusy={ loading }
 					>
-						{ __( 'Load album', 'album-importer-for-google-photos' ) }
+						{ __(
+							'Load album',
+							'album-importer-for-google-photos'
+						) }
 					</Button>
 					{ error && <p className="aigp-modal__error">{ error }</p> }
 				</div>

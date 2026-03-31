@@ -73,7 +73,10 @@ function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
 				variant="secondary"
 				onClick={ () => setIsOpen( true ) }
 			>
-				{ __( 'Import from Google Photos', 'album-importer-for-google-photos' ) }
+				{ __(
+					'Import from Google Photos',
+					'album-importer-for-google-photos'
+				) }
 			</Button>
 			<GooglePhotosAlbumModal
 				isOpen={ isOpen }

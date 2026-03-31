@@ -249,7 +249,10 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 					<BlockControls group="other">
 						<ToolbarButton
 							icon="update"
-							label={ __( 'Re-sync', 'album-importer-for-google-photos' ) }
+							label={ __(
+								'Re-sync',
+								'album-importer-for-google-photos'
+							) }
 							onClick={ verifyAlbum }
 							disabled={ loading || importing }
 						/>
