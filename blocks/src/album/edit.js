@@ -1,6 +1,7 @@
 import {
 	useState,
 	useEffect,
+	useCallback,
 	createInterpolateElement,
 } from '@wordpress/element';
 import {
@@ -219,22 +220,25 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 	 * Create a gallery block with the imported images
 	 * @param {Array} images - The imported images
 	 */
-	const createGalleryBlock = ( images ) => {
-		const galleryBlock = createBlock(
-			'core/gallery',
-			{
-				ids: images.map( ( img ) => img.attachment_id ),
-			},
-			images.map( ( img ) =>
-				createBlock( 'core/image', {
-					id: img.attachment_id,
-					url: img.attachment_url,
-				} )
-			)
-		);
+	const createGalleryBlock = useCallback(
+		( images ) => {
+			const galleryBlock = createBlock(
+				'core/gallery',
+				{
+					ids: images.map( ( img ) => img.attachment_id ),
+				},
+				images.map( ( img ) =>
+					createBlock( 'core/image', {
+						id: img.attachment_id,
+						url: img.attachment_url,
+					} )
+				)
+			);
 
-		replaceInnerBlocks( clientId, [ galleryBlock ], true );
-	};
+			replaceInnerBlocks( clientId, [ galleryBlock ], true );
+		},
+		[ clientId, replaceInnerBlocks ]
+	);
 
 	useEffect( () => {
 		if ( importCompleted ) {
