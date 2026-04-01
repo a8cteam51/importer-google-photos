@@ -90,7 +90,7 @@ function ExtraGooglePhotosButton( { originalRender, mediaProps, button } ) {
 // Augment the MediaUpload render to append our button next to the default placeholder button(s).
 addFilter(
 	'editor.MediaUpload',
-	'importer-google-photos/mediaupload-hook',
+	'album-importer-for-google-photos/mediaupload-hook',
 	( OriginalComponent ) => ( props ) => {
 		const { name } = useBlockEditContext();
 		const { render: originalRender } = props;
