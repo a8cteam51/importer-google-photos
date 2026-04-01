@@ -240,7 +240,7 @@ export default function Edit( { clientId, attributes, setAttributes } ) {
 		if ( importCompleted ) {
 			createGalleryBlock( importedImages );
 		}
-	}, [ importCompleted ] );
+	}, [ importCompleted, createGalleryBlock, importedImages ] );
 
 	return (
 		<div { ...blockProps }>
