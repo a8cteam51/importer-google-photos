@@ -1,16 +1,16 @@
-.gpa-modal {
-	.components-modal__content:has(.gpa-modal__content.is-busy) {
+.aigp-modal {
+	.components-modal__content:has(.aigp-modal__content.is-busy) {
 		pointer-events: none;
 	}
 
-	.gpa-modal__body {
+	.aigp-modal__body {
 		display: flex;
 		flex-direction: column;
 
-		.gpa-modal__header {
+		.aigp-modal__header {
 			margin-bottom: 16px;
 
-			.gpa-modal__instructions {
+			.aigp-modal__instructions {
 				margin-top: 0;
 				margin-bottom: 16px;
 				color: #757575;
@@ -21,7 +21,7 @@
 			}
 		}
 
-		.gpa-modal__content {
+		.aigp-modal__content {
 			display: flex;
 			flex: 1;
 			flex-direction: column;
@@ -32,7 +32,7 @@
 				opacity: .6;
 			}
 
-			.gpa-modal__grid {
+			.aigp-modal__grid {
 				display: grid;
 				gap: 16px;
 				grid-auto-rows: 1fr;
@@ -46,7 +46,7 @@
 					grid-template-columns: repeat(5, 1fr);
 				}
 
-				.gpa-modal__item {
+				.aigp-modal__item {
 					background-color: #ccc;
 					border: 0;
 					border-radius: 4px;
@@ -58,7 +58,7 @@
 					position: relative;
 					width: 100%;
 
-					.gpa-modal__item-button {
+					.aigp-modal__item-button {
 						position: absolute;
 						top: 0;
 						left: 0;
@@ -75,7 +75,7 @@
 							border: 1px solid rgba(0,0,0,.1);
 							border-color: var(--wp-components-color-accent,var(--wp-admin-theme-color,#3858e9));
 
-							.gpa-modal__checkbox-badge {
+							.aigp-modal__checkbox-badge {
 								background: var(--wp-components-color-accent,var(--wp-admin-theme-color,#3858e9));
 								color: #fff;
 								box-shadow: 0 0 0 1px var(--wp-components-color-accent,var(--wp-admin-theme-color,#3858e9));
@@ -83,7 +83,7 @@
 						}
 					}
 
-					.gpa-modal__thumb {
+					.aigp-modal__thumb {
 						border: 1px solid rgba(0, 0, 0, .1);
 						border-radius: 4px;
 						display: block;
@@ -96,7 +96,7 @@
 						width: 100%;
 					}
 
-					.gpa-modal__checkbox-badge {
+					.aigp-modal__checkbox-badge {
 						position: absolute;
 						top: 8px;
 						left: 8px;
@@ -114,7 +114,7 @@
 						z-index: 2;
 					}
 
-					.gpa-modal__selection-overlay {
+					.aigp-modal__selection-overlay {
 						position: absolute;
 						inset: 0;
 						background: var(--wp-components-color-accent,var(--wp-admin-theme-color,#3858e9));
@@ -126,7 +126,7 @@
 				}
 			}
 
-			.gpa-modal__footer {
+			.aigp-modal__footer {
 				align-items: center;
 				background: #fff;
 				bottom: 0;

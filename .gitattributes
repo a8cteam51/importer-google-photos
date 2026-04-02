@@ -7,7 +7,6 @@
 /.* export-ignore
 /README.md export-ignore
 codeception.dist.yml export-ignore
-composer.json export-ignore
 composer.lock export-ignore
 package.json export-ignore
 package-lock.json export-ignore

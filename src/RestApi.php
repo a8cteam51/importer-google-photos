@@ -24,7 +24,7 @@ final class RestApi {
 	 *
 	 * @var     string
 	 */
-	public const REST_NAMESPACE = 'google-photos-album/v1';
+	public const REST_NAMESPACE = 'aigp/v1';
 
 	/**
 	 * Initializes the blocks.
@@ -57,7 +57,11 @@ final class RestApi {
 			array(
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'import_album' ),
-				'permission_callback' => fn () => \current_user_can( 'edit_posts' ) && \current_user_can( 'upload_files' ),
+				'permission_callback' => function ( \WP_REST_Request $request ) {
+					$post_id = (int) $request->get_param( 'post_id' );
+					return \current_user_can( 'upload_files' )
+						&& ( 0 === $post_id || \current_user_can( 'edit_post', $post_id ) );
+				},
 				'args'                => array(
 					'image_url' => array(
 						'required'          => true,
@@ -221,7 +225,7 @@ final class RestApi {
 	 * @return  string
 	 */
 	private function get_option_key( string $album_id ): string {
-		return 'gpa_imported_' . $album_id;
+		return 'aigp_imported_' . $album_id;
 	}
 
 	// endregion

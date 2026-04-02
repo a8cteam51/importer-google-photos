@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @return  ($property is null ? PluginMetaData : ($property is PluginMetaKey ? PluginMetaData[PluginMetaKey] : null))
  */
-function google_photos_album_get_plugin_metadata( $property = null ) {
+function aigp_get_plugin_metadata( $property = null ) {
 	static $plugin_data = null;
 
 	$can_translate = 0 < did_action( 'init' );
@@ -22,7 +22,7 @@ function google_photos_album_get_plugin_metadata( $property = null ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$plugin_file                   = trailingslashit( WP_PLUGIN_DIR ) . constant( 'GOOGLE_PHOTOS_ALBUM_BASENAME' );
+		$plugin_file                   = trailingslashit( WP_PLUGIN_DIR ) . constant( 'AIGP_BASENAME' );
 		$plugin_data[ $translate_key ] = get_plugin_data( $plugin_file, false, $can_translate );
 	}
 
@@ -46,8 +46,8 @@ function google_photos_album_get_plugin_metadata( $property = null ) {
  *
  * @return  string
  */
-function google_photos_album_get_plugin_slug() {
-	$text_domain = google_photos_album_get_plugin_metadata( 'TextDomain' );
+function aigp_get_plugin_slug() {
+	$text_domain = aigp_get_plugin_metadata( 'TextDomain' );
 	return sanitize_key( $text_domain );
 }
 
@@ -59,8 +59,8 @@ function google_photos_album_get_plugin_slug() {
  *
  * @return  string
  */
-function google_photos_album_get_plugin_name() {
-	return google_photos_album_get_plugin_metadata( 'Name' );
+function aigp_get_plugin_name() {
+	return aigp_get_plugin_metadata( 'Name' );
 }
 
 /**
@@ -71,8 +71,8 @@ function google_photos_album_get_plugin_name() {
  *
  * @return  string
  */
-function google_photos_album_get_plugin_version() {
-	return google_photos_album_get_plugin_metadata( 'Version' );
+function aigp_get_plugin_version() {
+	return aigp_get_plugin_metadata( 'Version' );
 }
 
 /**
@@ -82,7 +82,7 @@ function google_photos_album_get_plugin_version() {
  *
  * @return  bool
  */
-function google_photos_album_is_wp_version_compatible( $min_wp_version ) {
+function aigp_is_wp_version_compatible( $min_wp_version ) {
 	if ( ! function_exists( 'is_wp_version_compatible' ) ) {
 		return false;
 	}
@@ -97,7 +97,7 @@ function google_photos_album_is_wp_version_compatible( $min_wp_version ) {
  *
  * @return  bool
  */
-function google_photos_album_is_php_version_compatible( $min_php_version ) {
+function aigp_is_php_version_compatible( $min_php_version ) {
 	if ( ! function_exists( 'is_php_version_compatible' ) ) {
 		return false;
 	}
@@ -110,8 +110,8 @@ function google_photos_album_is_php_version_compatible( $min_php_version ) {
  *
  * @return  true|\WP_Error
  */
-function google_photos_album_validate_requirements() {
-	$plugin_metadata = google_photos_album_get_plugin_metadata();
+function aigp_validate_requirements() {
+	$plugin_metadata = aigp_get_plugin_metadata();
 	if ( ! isset( $plugin_metadata['RequiresPHP'] ) || '' === $plugin_metadata['RequiresPHP'] ) {
 		$plugin_metadata['RequiresPHP'] = '8.3';
 	}
@@ -119,8 +119,8 @@ function google_photos_album_validate_requirements() {
 		$plugin_metadata['RequiresWP'] = '6.7';
 	}
 
-	$is_php_compatible = google_photos_album_is_php_version_compatible( $plugin_metadata['RequiresPHP'] );
-	$is_wp_compatible  = google_photos_album_is_wp_version_compatible( $plugin_metadata['RequiresWP'] );
+	$is_php_compatible = aigp_is_php_version_compatible( $plugin_metadata['RequiresPHP'] );
+	$is_wp_compatible  = aigp_is_wp_version_compatible( $plugin_metadata['RequiresWP'] );
 
 	$wp_error = new \WP_Error();
 	if ( ! $is_wp_compatible ) {
@@ -140,19 +140,19 @@ function google_photos_album_validate_requirements() {
  *
  * @return  void
  */
-function google_photos_album_output_requirements_error( $error ) {
+function aigp_output_requirements_error( $error ) {
 	add_action(
 		'admin_notices',
 		static function () use ( $error ) {
 			$requirements_error = \wp_sprintf(
 				/* translators: 1: Plugin name, 2: Plugin version */
-				__( '<strong>%1$s (version %2$s)</strong> could not be initialized.', 'importer-google-photos' ),
-				google_photos_album_get_plugin_metadata( 'Name' ),
-				google_photos_album_get_plugin_metadata( 'Version' )
+				__( '<strong>%1$s (version %2$s)</strong> could not be initialized.', 'album-importer-for-google-photos' ),
+				aigp_get_plugin_metadata( 'Name' ),
+				aigp_get_plugin_metadata( 'Version' )
 			);
 
 			if ( $error->has_errors() ) {
-				$requirements_error .= ' ' . \__( 'Your environment does not meet all the system requirements listed below:', 'importer-google-photos' );
+				$requirements_error .= ' ' . \__( 'Your environment does not meet all the system requirements listed below:', 'album-importer-for-google-photos' );
 				$requirements_error .= '<ul class="ul-disc">';
 
 				foreach ( $error->get_error_codes() as $error_code ) {
@@ -165,7 +165,7 @@ function google_photos_album_output_requirements_error( $error ) {
 						case 'plugin_wp_incompatible':
 							$error_message = wp_sprintf(
 								/* translators: 1: Current WP version, 2: Minimum WP version */
-								__( 'Current <em>WordPress version (%1$s)</em> does not meet minimum required version of %2$s.', 'importer-google-photos' ),
+								__( 'Current <em>WordPress version (%1$s)</em> does not meet minimum required version of %2$s.', 'album-importer-for-google-photos' ),
 								get_bloginfo( 'version' ),
 								$error_data['requires_wp']
 							);
@@ -173,13 +173,13 @@ function google_photos_album_output_requirements_error( $error ) {
 						case 'plugin_php_incompatible':
 							$error_message = wp_sprintf(
 								/* translators: 1: Current PHP version, 2: Minimum PHP version */
-								__( 'Current <em>PHP version (%1$s)</em> does not meet minimum required version of %2$s.', 'importer-google-photos' ),
+								__( 'Current <em>PHP version (%1$s)</em> does not meet minimum required version of %2$s.', 'album-importer-for-google-photos' ),
 								PHP_VERSION,
 								$error_data['requires_php']
 							);
 							break;
 						case 'missing_autoloader':
-							$error_message = __( 'The autoloader file is missing. Please run <code>composer install</code> to generate it.', 'importer-google-photos' );
+							$error_message = __( 'The autoloader file is missing. Please run <code>composer install</code> to generate it.', 'album-importer-for-google-photos' );
 							break;
 						default:
 							$error_message = $error->get_error_message( $error_code );

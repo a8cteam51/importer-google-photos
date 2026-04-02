@@ -21,32 +21,32 @@
  * Author URI:              https://wpspecialprojects.wordpress.com
  * License:                 GPL v3 or later
  * License URI:             https://www.gnu.org/licenses/gpl-3.0.html
- * Text Domain:             importer-google-photos
+ * Text Domain:             album-importer-for-google-photos
  * Domain Path:             /languages
  **/
 
 defined( 'ABSPATH' ) || exit;
 
 // Define plugin constants.
-define( 'GOOGLE_PHOTOS_ALBUM_BASENAME', plugin_basename( __FILE__ ) );
-define( 'GOOGLE_PHOTOS_ALBUM_DIR_PATH', plugin_dir_path( __FILE__ ) );
-define( 'GOOGLE_PHOTOS_ALBUM_DIR_URL', plugin_dir_url( __FILE__ ) );
+define( 'AIGP_BASENAME', plugin_basename( __FILE__ ) );
+define( 'AIGP_DIR_PATH', plugin_dir_path( __FILE__ ) );
+define( 'AIGP_DIR_URL', plugin_dir_url( __FILE__ ) );
 
 // Load the rest of the bootstrap functions.
-require_once GOOGLE_PHOTOS_ALBUM_DIR_PATH . '/functions-bootstrap.php';
+require_once AIGP_DIR_PATH . '/functions-bootstrap.php';
 
 // Load the autoloader.
-if ( ! is_file( GOOGLE_PHOTOS_ALBUM_DIR_PATH . '/vendor/autoload.php' ) ) {
-	google_photos_album_output_requirements_error( new WP_Error( 'missing_autoloader' ) );
+if ( ! is_file( AIGP_DIR_PATH . '/vendor/autoload.php' ) ) {
+	aigp_output_requirements_error( new WP_Error( 'missing_autoloader' ) );
 	return;
 }
-require_once GOOGLE_PHOTOS_ALBUM_DIR_PATH . '/vendor/autoload.php';
+require_once AIGP_DIR_PATH . '/vendor/autoload.php';
 
 // Bootstrap the plugin (maybe)!
-define( 'GOOGLE_PHOTOS_ALBUM_REQUIREMENTS', google_photos_album_validate_requirements() );
-if ( is_wp_error( GOOGLE_PHOTOS_ALBUM_REQUIREMENTS ) ) {
-	google_photos_album_output_requirements_error( GOOGLE_PHOTOS_ALBUM_REQUIREMENTS );
+define( 'AIGP_REQUIREMENTS', aigp_validate_requirements() );
+if ( is_wp_error( AIGP_REQUIREMENTS ) ) {
+	aigp_output_requirements_error( AIGP_REQUIREMENTS );
 } else {
-	require_once GOOGLE_PHOTOS_ALBUM_DIR_PATH . '/functions.php';
-	add_action( 'plugins_loaded', array( google_photos_album_get_plugin_instance(), 'initialize' ) );
+	require_once AIGP_DIR_PATH . '/functions.php';
+	add_action( 'plugins_loaded', array( aigp_get_plugin_instance(), 'initialize' ) );
 }

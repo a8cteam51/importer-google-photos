@@ -7,7 +7,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="importer-google-photos"/>
+				<element value="album-importer-for-google-photos"/>
 			</property>
 		</properties>
 	</rule>
@@ -16,9 +16,8 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="a8csp_"/>
-				<element value="gpa_"/>
-				<element value="google_photos_album_"/>
+				<element value="aigp_"/>
+				<element value="AIGP_"/>
 				<element value="A8C\SpecialProjects\GooglePhotosAlbum"/>
 			</property>
 		</properties>
