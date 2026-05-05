@@ -71,7 +71,10 @@ Yes. The plugin provides a Gutenberg block for inserting and importing the album
 
 == External services ==
 
-This plugin relies on Google Photos (a third-party service operated by Google LLC) to read and import publicly shared album content. No data is sent to any external service unless an authorized user explicitly pastes a Google Photos album URL into the block and clicks "Start Import".
+This plugin relies on Google Photos (a third-party service operated by Google LLC) to read and import publicly shared album content. No data is sent to any external service unless an authorized user explicitly provides a Google Photos album URL to the plugin. There are two entry points that trigger requests to Google:
+
+1. The "Album Importer for Google Photos" block in the post/page editor — pasting an album URL and clicking "Start Import".
+2. The "Import from Google Photos" button on the WordPress Media Library screen — pasting an album URL into the modal and clicking "Load album".
 
 = Google Photos =
 
@@ -79,10 +82,11 @@ What it is and what it is used for: Google Photos is Google's photo hosting and 
 
 What data is sent and when:
 
-* When an authorized editor clicks "Start Import" in the block, the plugin makes an HTTP GET request to the album URL on `photos.google.com` or `photos.app.goo.gl` to retrieve the album's public HTML page and parse the list of image URLs.
-* For each image found in the album, the plugin makes an HTTP HEAD request to `lh3.googleusercontent.com` to read the `Content-Disposition` header for filename inference (the import continues even if this request fails).
-* For each image, the plugin then issues an HTTP GET request to `lh3.googleusercontent.com` to download the image bytes and store them as a WordPress media attachment.
-* No user credentials, account information, site data, or telemetry are transmitted. The only data sent is the album URL the user pastes (and the derived image URLs from that album), plus the standard HTTP request headers added by WordPress's HTTP API (user agent, etc.).
+* **Verify the album (server → Google).** When an authorized editor pastes an album URL and triggers verification (clicking "Start Import" in the block, or "Load album" in the media-library modal), the plugin makes a server-side HTTP GET request to the album URL on `photos.google.com` or `photos.app.goo.gl` to retrieve the album's public HTML page and parse the list of image URLs.
+* **Render thumbnail previews (browser → Google).** After verification returns the list of images, the plugin renders thumbnails directly in the editor by setting each image URL as the `src` of an `<img>` tag. This causes the editor user's browser to make HTTP GET requests to `lh3.googleusercontent.com` for each thumbnail.
+* **Filename inference (server → Google).** For each image to be imported, the plugin makes a server-side HTTP HEAD request to `lh3.googleusercontent.com` to read the `Content-Disposition` header (the import continues even if this request fails).
+* **Image download (server → Google).** For each image, the plugin issues a server-side HTTP GET request to `lh3.googleusercontent.com` to download the image bytes and store them as a WordPress media attachment.
+* No user credentials, account information, or telemetry are collected or transmitted by the plugin. The only data the plugin sends is the album URL the editor pastes (and the derived image URLs from that album).
 
 Use of Google's services is subject to Google's terms:
 
@@ -104,7 +108,7 @@ Build tools and instructions:
     2. `npm run build`
     3. `composer install --no-dev --optimize-autoloader`
 * A `build.sh` script in the repository produces a distributable ZIP that mirrors the version published here.
-* JavaScript sources are located in `assets/js/src/` and `blocks/src/`. CSS sources are located in `assets/css/src/`.
+* JavaScript and SCSS sources are located in `assets/js/src/` (e.g. `style.scss`) and `blocks/src/album/` (e.g. `editor.scss`). They are compiled by `@wordpress/scripts` into the `assets/js/build/` and `blocks/build/` directories.
 
 == Changelog ==
 
