@@ -108,10 +108,5 @@ Build tools and instructions:
 
 == Changelog ==
 
-= 1.0.0-beta.3 =
-* Initial public beta release.
-
-== Upgrade Notice ==
-
-= 1.0.0-beta.3 =
-Initial public beta.
+= 1.0.0 =
+* Initial public release.
