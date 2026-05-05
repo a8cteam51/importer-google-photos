@@ -71,20 +71,40 @@ Yes. The plugin provides a Gutenberg block for inserting and importing the album
 
 == External services ==
 
-This plugin connects to Google Photos to import album images into your WordPress media library.
+This plugin relies on Google Photos (a third-party service operated by Google LLC) to read and import publicly shared album content. No data is sent to any external service unless an authorized user explicitly pastes a Google Photos album URL into the block and clicks "Start Import".
 
 = Google Photos =
 
-When a user pastes a public Google Photos album URL and starts an import, the plugin:
+What it is and what it is used for: Google Photos is Google's photo hosting and sharing service. The plugin uses it to fetch the contents of a publicly shared album so the images can be saved into the WordPress media library and rendered as a gallery.
 
-* Fetches the album page from Google Photos to parse available images.
-* Downloads each image from Google's content servers (lh3.googleusercontent.com) and saves it to the WordPress media library.
-* Makes a HEAD request to each image URL to read the Content-Disposition header for better filename inference; the download still proceeds even if this request fails.
+What data is sent and when:
 
-No user account or authentication data is sent to Google. Only publicly shared album URLs are accessed.
+* When an authorized editor clicks "Start Import" in the block, the plugin makes an HTTP GET request to the album URL on `photos.google.com` or `photos.app.goo.gl` to retrieve the album's public HTML page and parse the list of image URLs.
+* For each image found in the album, the plugin makes an HTTP HEAD request to `lh3.googleusercontent.com` to read the `Content-Disposition` header for filename inference (the import continues even if this request fails).
+* For each image, the plugin then issues an HTTP GET request to `lh3.googleusercontent.com` to download the image bytes and store them as a WordPress media attachment.
+* No user credentials, account information, site data, or telemetry are transmitted. The only data sent is the album URL the user pastes (and the derived image URLs from that album), plus the standard HTTP request headers added by WordPress's HTTP API (user agent, etc.).
 
-* [Google Terms of Service](https://policies.google.com/terms)
-* [Google Privacy Policy](https://policies.google.com/privacy)
+Use of Google's services is subject to Google's terms:
+
+* Google Terms of Service: https://policies.google.com/terms
+* Google Privacy Policy: https://policies.google.com/privacy
+
+== Source Code ==
+
+The full, unminified source code for this plugin — including the JavaScript and CSS sources used to generate the compiled files in `assets/js/build/` and `blocks/build/` — is publicly available on GitHub:
+
+https://github.com/a8cteam51/importer-google-photos
+
+Build tools and instructions:
+
+* JavaScript and CSS are built with `@wordpress/scripts` (webpack) via npm.
+* PHP dependencies are managed with Composer.
+* To build the plugin from source, clone the repository and run:
+    1. `npm ci`
+    2. `npm run build`
+    3. `composer install --no-dev --optimize-autoloader`
+* A `build.sh` script in the repository produces a distributable ZIP that mirrors the version published here.
+* JavaScript sources are located in `assets/js/src/` and `blocks/src/`. CSS sources are located in `assets/css/src/`.
 
 == Changelog ==
 
