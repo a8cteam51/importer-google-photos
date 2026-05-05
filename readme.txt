@@ -71,27 +71,46 @@ Yes. The plugin provides a Gutenberg block for inserting and importing the album
 
 == External services ==
 
-This plugin connects to Google Photos to import album images into your WordPress media library.
+This plugin relies on Google Photos (a third-party service operated by Google LLC) to read and import publicly shared album content. No data is sent to any external service unless an authorized user explicitly provides a Google Photos album URL to the plugin. There are two entry points that trigger requests to Google:
+
+1. The "Album Importer for Google Photos" block in the post/page editor — pasting an album URL and clicking "Start Import".
+2. The "Import from Google Photos" button that the plugin adds to the media-selection modal of core Image, Gallery, Cover, and Media & Text blocks — pasting an album URL into the modal and clicking "Load album".
 
 = Google Photos =
 
-When a user pastes a public Google Photos album URL and starts an import, the plugin:
+What it is and what it is used for: Google Photos is Google's photo hosting and sharing service. The plugin uses it to fetch the contents of a publicly shared album so the images can be saved into the WordPress media library and rendered as a gallery.
 
-* Fetches the album page from Google Photos to parse available images.
-* Downloads each image from Google's content servers (lh3.googleusercontent.com) and saves it to the WordPress media library.
-* Makes a HEAD request to each image URL to read the Content-Disposition header for better filename inference; the download still proceeds even if this request fails.
+What data is sent and when:
 
-No user account or authentication data is sent to Google. Only publicly shared album URLs are accessed.
+* **Verify the album (server → Google).** When an authorized editor pastes an album URL and triggers verification (clicking "Start Import" in the block, or "Load album" in the media-library modal), the plugin makes a server-side HTTP GET request to the album URL on `photos.google.com` or `photos.app.goo.gl` to retrieve the album's public HTML page and parse the list of image URLs.
+* **Render thumbnail previews (browser → Google).** After verification returns the list of images, the plugin renders thumbnails directly in the editor by setting each image URL as the `src` of an `<img>` tag. This causes the editor user's browser to make HTTP GET requests to `lh3.googleusercontent.com` for each thumbnail.
+* **Filename inference (server → Google).** For each image to be imported, the plugin makes a server-side HTTP HEAD request to `lh3.googleusercontent.com` to read the `Content-Disposition` header (the import continues even if this request fails).
+* **Image download (server → Google).** For each image, the plugin issues a server-side HTTP GET request to `lh3.googleusercontent.com` to download the image bytes and store them as a WordPress media attachment.
+* No user credentials, account information, or telemetry are collected or transmitted by the plugin. The only data the plugin sends is the album URL the editor pastes (and the derived image URLs from that album).
 
-* [Google Terms of Service](https://policies.google.com/terms)
-* [Google Privacy Policy](https://policies.google.com/privacy)
+Use of Google's services is subject to Google's terms:
+
+* Google Terms of Service: https://policies.google.com/terms
+* Google Privacy Policy: https://policies.google.com/privacy
+
+== Source Code ==
+
+The full, unminified source code for this plugin — including the JavaScript and CSS sources used to generate the compiled files in `assets/js/build/` and `blocks/build/` — is publicly available on GitHub:
+
+https://github.com/a8cteam51/importer-google-photos
+
+Build tools and instructions:
+
+* JavaScript and CSS are built with `@wordpress/scripts` (webpack) via npm.
+* PHP dependencies are managed with Composer.
+* To build the plugin from source, clone the repository and run:
+    1. `npm ci`
+    2. `npm run build`
+    3. `composer install --no-dev --optimize-autoloader`
+* A `build.sh` script in the repository produces a distributable ZIP that mirrors the version published here.
+* JavaScript and SCSS sources are located in `assets/js/src/` (e.g. `style.scss`) and `blocks/src/album/` (e.g. `editor.scss`). They are compiled by `@wordpress/scripts` into the `assets/js/build/` and `blocks/build/` directories.
 
 == Changelog ==
 
-= 1.0.0-beta.3 =
-* Initial public beta release.
-
-== Upgrade Notice ==
-
-= 1.0.0-beta.3 =
-Initial public beta.
+= 1.0.0 =
+* Initial public release.
