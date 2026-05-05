@@ -74,7 +74,7 @@ Yes. The plugin provides a Gutenberg block for inserting and importing the album
 This plugin relies on Google Photos (a third-party service operated by Google LLC) to read and import publicly shared album content. No data is sent to any external service unless an authorized user explicitly provides a Google Photos album URL to the plugin. There are two entry points that trigger requests to Google:
 
 1. The "Album Importer for Google Photos" block in the post/page editor — pasting an album URL and clicking "Start Import".
-2. The "Import from Google Photos" button on the WordPress Media Library screen — pasting an album URL into the modal and clicking "Load album".
+2. The "Import from Google Photos" button that the plugin adds to the media-selection modal of core Image, Gallery, Cover, and Media & Text blocks — pasting an album URL into the modal and clicking "Load album".
 
 = Google Photos =
 
