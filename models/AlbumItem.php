@@ -8,7 +8,7 @@ namespace A8C\SpecialProjects\GooglePhotosAlbum\Models;
  * @since   1.0.0
  * @version 1.0.0
  */
-readonly class AlbumItem {
+class AlbumItem {
 
 	/**
 	 * The download URL for the item.
