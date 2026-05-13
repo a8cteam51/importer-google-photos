@@ -12,69 +12,61 @@ Import Google Photos albums into your WordPress media library and display them i
 
 == Description ==
 
-Album Importer for Google Photos lets you quickly import images from a public Google Photos album into your WordPress site and show them as a gallery. Add the block to any post or page, paste a Google Photos album URL, and start the import — the images are added to your Media Library and displayed automatically.
+Album Importer for Google Photos lets you quickly import images from a public Google Photos album into your WordPress site and show them as a gallery. Add the block to any post or page, paste a Google Photos album URL, and start the import -- the images are added to your Media Library and displayed automatically.
 
-== Installation ==
-
-**From WordPress Admin**
-1. Go to Plugins → Add New.
-2. Search for "Google Photos Album".
-3. Click Install Now, then Activate.
-
-**Manual Installation**
-1. Download the plugin ZIP.
-2. Upload the `importer-google-photos` folder to `/wp-content/plugins/`.
-3. Activate the plugin through the Plugins menu in WordPress.
-
-== Instructions ==
-
-Basic Usage
+= Basic Usage =
 
 1. Create or edit a post/page where you want the gallery.
 2. Add the "Google Photos Album" block.
 3. From Google Photos, share your album and copy the public link.
 4. Paste the album URL into the block.
 5. Click Start Import.
-6. Wait for completion — the gallery is created automatically.
+6. Wait for completion -- the gallery is created automatically.
 
-Album URL Format
+= Album URL Format =
 
 Use a publicly shared Google Photos album URL, for example:
 
 `https://photos.app.goo.gl/XXXXXXXXXXXXXXXXX`
 
+== Installation ==
 
-== Blocks ==
+= From WordPress Admin =
 
-This plugin provides 1 block.
+1. Go to Plugins -> Add New.
+2. Search for "Google Photos Album".
+3. Click Install Now, then Activate.
 
-- Album Importer for Google Photos — Paste a Google Photos album URL to import images and display a gallery.
+= Manual Installation =
 
+1. Download the plugin ZIP.
+2. Upload the `importer-google-photos` folder to `/wp-content/plugins/`.
+3. Activate the plugin through the Plugins menu in WordPress.
 
 == Frequently Asked Questions ==
 
-**What album URLs are supported?**
+= What album URLs are supported? =
 
 Publicly shared Google Photos album links (e.g., `https://photos.app.goo.gl/...`).
 
-**Where are images stored?**
+= Where are images stored? =
 
 Imported images are saved in your WordPress Media Library as standard attachments.
 
-**Do I need a Google API key?**
+= Do I need a Google API key? =
 
 No. A publicly shared album link is sufficient for importing.
 
-**Does it work with the block editor?**
-Yes. The plugin provides a Gutenberg block for inserting and importing the album.
+= Does it work with the block editor? =
 
+Yes. The plugin provides a Gutenberg block for inserting and importing the album.
 
 == External services ==
 
 This plugin relies on Google Photos (a third-party service operated by Google LLC) to read and import publicly shared album content. No data is sent to any external service unless an authorized user explicitly provides a Google Photos album URL to the plugin. There are two entry points that trigger requests to Google:
 
-1. The "Album Importer for Google Photos" block in the post/page editor — pasting an album URL and clicking "Start Import".
-2. The "Import from Google Photos" button that the plugin adds to the media-selection modal of core Image, Gallery, Cover, and Media & Text blocks — pasting an album URL into the modal and clicking "Load album".
+1. The "Album Importer for Google Photos" block in the post/page editor -- pasting an album URL and clicking "Start Import".
+2. The "Import from Google Photos" button that the plugin adds to the media-selection modal of core Image, Gallery, Cover, and Media & Text blocks -- pasting an album URL into the modal and clicking "Load album".
 
 = Google Photos =
 
@@ -82,22 +74,20 @@ What it is and what it is used for: Google Photos is Google's photo hosting and 
 
 What data is sent and when:
 
-* **Verify the album (server → Google).** When an authorized editor pastes an album URL and triggers verification (clicking "Start Import" in the block, or "Load album" in the media-library modal), the plugin makes a server-side HTTP GET request to the album URL on `photos.google.com` or `photos.app.goo.gl` to retrieve the album's public HTML page and parse the list of image URLs.
-* **Render thumbnail previews (browser → Google).** After verification returns the list of images, the plugin renders thumbnails directly in the editor by setting each image URL as the `src` of an `<img>` tag. This causes the editor user's browser to make HTTP GET requests to `lh3.googleusercontent.com` for each thumbnail.
-* **Filename inference (server → Google).** For each image to be imported, the plugin makes a server-side HTTP HEAD request to `lh3.googleusercontent.com` to read the `Content-Disposition` header (the import continues even if this request fails).
-* **Image download (server → Google).** For each image, the plugin issues a server-side HTTP GET request to `lh3.googleusercontent.com` to download the image bytes and store them as a WordPress media attachment.
+* **Verify the album (server -> Google).** When an authorized editor pastes an album URL and triggers verification (clicking "Start Import" in the block, or "Load album" in the media-library modal), the plugin makes a server-side HTTP GET request to the album URL on `photos.google.com` or `photos.app.goo.gl` to retrieve the album's public HTML page and parse the list of image URLs.
+* **Render thumbnail previews (browser -> Google).** After verification returns the list of images, the plugin renders thumbnails directly in the editor by setting each image URL as the `src` of an `<img>` tag. This causes the editor user's browser to make HTTP GET requests to `lh3.googleusercontent.com` for each thumbnail.
+* **Filename inference (server -> Google).** For each image to be imported, the plugin makes a server-side HTTP HEAD request to `lh3.googleusercontent.com` to read the `Content-Disposition` header (the import continues even if this request fails).
+* **Image download (server -> Google).** For each image, the plugin issues a server-side HTTP GET request to `lh3.googleusercontent.com` to download the image bytes and store them as a WordPress media attachment.
 * No user credentials, account information, or telemetry are collected or transmitted by the plugin. The only data the plugin sends is the album URL the editor pastes (and the derived image URLs from that album).
 
 Use of Google's services is subject to Google's terms:
 
-* Google Terms of Service: https://policies.google.com/terms
-* Google Privacy Policy: https://policies.google.com/privacy
+* [Google Terms of Service](https://policies.google.com/terms)
+* [Google Privacy Policy](https://policies.google.com/privacy)
 
 == Source Code ==
 
-The full, unminified source code for this plugin — including the JavaScript and CSS sources used to generate the compiled files in `assets/js/build/` and `blocks/build/` — is publicly available on GitHub:
-
-https://github.com/a8cteam51/importer-google-photos
+The full, unminified source code for this plugin -- including the JavaScript and CSS sources used to generate the compiled files in `assets/js/build/` and `blocks/build/` -- is publicly available on [GitHub](https://github.com/a8cteam51/importer-google-photos).
 
 Build tools and instructions:
 
