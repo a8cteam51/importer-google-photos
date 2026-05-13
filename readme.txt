@@ -82,8 +82,8 @@ What data is sent and when:
 
 Use of Google's services is subject to Google's terms:
 
-* Google Terms of Service: https://policies.google.com/terms
-* Google Privacy Policy: https://policies.google.com/privacy
+* [Google Terms of Service](https://policies.google.com/terms)
+* [Google Privacy Policy](https://policies.google.com/privacy)
 
 == Source Code ==
 
