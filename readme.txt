@@ -87,9 +87,7 @@ Use of Google's services is subject to Google's terms:
 
 == Source Code ==
 
-The full, unminified source code for this plugin -- including the JavaScript and CSS sources used to generate the compiled files in `assets/js/build/` and `blocks/build/` -- is publicly available on GitHub:
-
-https://github.com/a8cteam51/importer-google-photos
+The full, unminified source code for this plugin -- including the JavaScript and CSS sources used to generate the compiled files in `assets/js/build/` and `blocks/build/` -- is publicly available on [GitHub](https://github.com/a8cteam51/importer-google-photos).
 
 Build tools and instructions:
 
