@@ -5,7 +5,7 @@
  * @since       1.0.0
  * @version     1.0.0
  * @package     A8C\SpecialProjects\Plugins
- * @author      WordPress.com Special Projects
+ * @author      Automattic
  * @license     GPL-3.0-or-later
  *
  * @noinspection    ALL
@@ -17,8 +17,8 @@
  * Requires at least:       6.7
  * Tested up to:            6.9
  * Requires PHP:            8.2
- * Author:                  WordPress.com Special Projects
- * Author URI:              https://wpspecialprojects.wordpress.com
+ * Author:                  Automattic
+ * Author URI:              https://automattic.com
  * License:                 GPL v3 or later
  * License URI:             https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:             album-importer-for-google-photos
