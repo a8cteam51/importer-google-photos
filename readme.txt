@@ -28,7 +28,7 @@ Album Importer for Google Photos lets you easily import images from a public Goo
 = From WordPress Admin =
 
 1. Go to Plugins -> Add New.
-2. Search for "Google Photos Album".
+2. Search for "Album Importer for Google Photos".
 3. Click Install Now, then Activate.
 
 = Manual Installation =
