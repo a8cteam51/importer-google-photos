@@ -1,5 +1,5 @@
 === Album Importer for Google Photos ===
-Contributors: wpspecialprojects, cagrimmett, zoonini, kimclow, donnapep, drw158, vevas, fmfernandes, luisasacchetto, oh_hello, racheleliza
+Contributors: automattic, wpspecialprojects, cagrimmett, zoonini, kimclow, donnapep, drw158, vevas, fmfernandes, luisasacchetto, oh_hello, racheleliza
 Tags: google photos, album, gallery, importer, media library
 Requires at least: 6.7
 Tested up to: 6.9
